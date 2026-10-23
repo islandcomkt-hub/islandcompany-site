@@ -240,8 +240,7 @@
         cur = k; word.classList.add('has-on');
         btns.forEach(function (x) { x.setAttribute('aria-expanded', x === b ? 'true' : 'false'); });
         stage.className = 'word-stage ws2 fx-' + fx;
-        stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' +
-          (fx === 'desenvolvimento' ? '<span class="ws-bars"><i></i><i></i><i></i><i></i><i></i></span>' : '');
+        stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' ;
         var wEl = stage.querySelector('.ws2-w'), avail = stage.clientWidth * .96;
         if (wEl.scrollWidth > avail) wEl.style.fontSize = (parseFloat(getComputedStyle(wEl).fontSize) * avail / wEl.scrollWidth).toFixed(1) + 'px';
         var chars = [].slice.call(stage.querySelectorAll('.ws2-w i')), ws = [].slice.call(stage.querySelectorAll('.ws2-t i')), bars = [].slice.call(stage.querySelectorAll('.ws-bars i'));
