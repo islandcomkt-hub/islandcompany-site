@@ -201,7 +201,7 @@
   })();
 
   /* botões que levam ao onboarding */
-  [].slice.call(document.querySelectorAll('a[href^="https://onboarding.islandcompany.space"]')).forEach(function (a) { a.classList.add('onb'); });
+  [].slice.call(document.querySelectorAll('a[href^="https://onboarding.islandcompany.space"], #nav a[href^="https://wa.me"]')).forEach(function (a) { a.classList.add('onb'); });
 
   /* ---------- portfólio dentro do site ---------- */
   var data = null, ov = null, sheet, body, title, sub, back, lastFocus = null;
