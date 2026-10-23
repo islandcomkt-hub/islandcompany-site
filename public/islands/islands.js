@@ -204,7 +204,18 @@
     setState(from === -1 ? 'approaching' : (toFocus ? 'travelling' : 'returning'));
     if (toFocus && from === -1 && mobile) { var r = root.getBoundingClientRect(); if (r.top < 70 || r.top > innerHeight * 0.35) root.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'start' }); }
     if (act) { root.tabIndex = -1; root.focus({ preventScroll: true }); }
-    closePanel(); dimFor(toFocus ? target : -1); sc.setFocus(toFocus ? target : -1);
+    var swipe = 0, ghost = null;
+    root.querySelectorAll('.isl-ghost').forEach(function (g) { g.remove(); }); panel.style.visibility = '';
+    if (toFocus && from >= 0 && from !== target && panel.dataset.open === 'true' && !RM.matches && panel.animate) {
+      swipe = act === 'prev' ? -1 : act === 'next' ? 1 : (target > from ? 1 : -1);
+      if ((target === 0 && from === N - 1 && act !== 'prev') || (target === N - 1 && from === 0 && act !== 'next')) swipe = act === 'prev' ? -1 : (target === 0 ? 1 : -1);
+      ghost = panel.cloneNode(true); ghost.removeAttribute('id'); ghost.inert = true; ghost.classList.add('isl-ghost');
+      ghost.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+      if (getComputedStyle(panel).position !== 'absolute') { ghost.style.position = 'absolute'; ghost.style.top = panel.offsetTop + 'px'; ghost.style.left = panel.offsetLeft + 'px'; ghost.style.width = panel.offsetWidth + 'px'; ghost.style.margin = '0'; }
+      panel.parentNode.insertBefore(ghost, panel.nextSibling);
+      panel.style.visibility = 'hidden'; panel.inert = true;
+    } else closePanel();
+    dimFor(toFocus ? target : -1); sc.setFocus(toFocus ? target : -1);
 
     var c0 = cam, c1 = toFocus ? camFocus(target) : camOverview(), ho0 = curHO, ho1 = hoFor(toFocus ? target : -1);
     var T = RM.matches ? 0 : (travelBoat ? 2500 : (toFocus ? 1200 : 1050));
@@ -214,6 +225,17 @@
       path = sc.makePath(boatAt, target, boatRy, sc.dockHeading(target, side));
       if (!RM.matches) T = Math.max(2600, Math.min(5200, Math.round(1500 + path.len * 38)));
     }
+    var preRendered = false;
+    if (swipe) {
+      var half = Math.round(T * 0.5), off = (window.innerWidth * 1.1) + 'px';
+      var ga = ghost.animate([{ translate: '0 0' }, { translate: 'calc(' + (-swipe) + ' * ' + off + ') 0' }], { duration: half, easing: 'cubic-bezier(.55,0,.75,.4)', fill: 'forwards' });
+      ga.onfinish = function () { ghost.remove(); };
+      setTimeout(function () {
+        if (id !== tk) { if (ghost.parentNode) ghost.remove(); return; }
+        renderPanel(target); preRendered = true; panel.style.visibility = ''; panel.dataset.open = 'true'; panel.classList.add('isl-swipein');
+        panel.animate([{ translate: 'calc(' + swipe + ' * ' + off + ') 0' }, { translate: '0 0' }], { duration: T - half, easing: 'cubic-bezier(.2,.7,.25,1)' });
+      }, half);
+    }
     var lift = (from >= 0 && toFocus) ? Math.max(c0.d, c1.d) * 0.5 : 0;
     var BS = 250, BE = T - 450, sRot = boatRy, lastNow = 0, lastRy = boatRy;
 
@@ -222,7 +244,7 @@
       applyCam(c1, ho1); sc.clearWake(); renderNow();
       cur = toFocus ? target : -1; dest = -2;
       if (toFocus) {
-        renderPanel(target); setState('focused'); openPanel();
+        if (!preRendered) renderPanel(target); panel.style.visibility = ''; setState('focused'); openPanel(); setTimeout(function () { panel.classList.remove('isl-swipein'); }, 50);
         if (act === 'prev' || act === 'next' || act === 'all') { var b = panel.querySelector('[data-act="' + act + '"]'); if (b) b.focus({ preventScroll: true }); }
         else if (act === 'h' || from === -1) { var h = panel.querySelector('#isl-h'); if (h) h.focus({ preventScroll: true }); }
         if (act) live.textContent = D.islands[target].name + ', ilha ' + (target + 1) + ' de ' + N;
@@ -277,7 +299,7 @@
     measure();
     if (!sc) return;
     sc.clearWake(); sc.layout(mobile); sizeCanvas();
-    if (busy) { cur = endIdx; dest = -2; if (endIdx >= 0) { boatAt = endIdx; boatSide = boatSide; } setState(endIdx >= 0 ? 'focused' : 'overview'); if (endIdx >= 0) { renderPanel(endIdx); openPanel(); dimFor(endIdx); } else { dimFor(-1); } sc.setFocus(endIdx); }
+    if (busy) { cur = endIdx; dest = -2; if (endIdx >= 0) { boatAt = endIdx; boatSide = boatSide; } setState(endIdx >= 0 ? 'focused' : 'overview'); if (endIdx >= 0) { renderPanel(endIdx); panel.style.visibility = ''; openPanel(); dimFor(endIdx); } else { dimFor(-1); } sc.setFocus(endIdx); }
     boatRy = sc.dockBoat(boatAt, boatSide);
     applyCam(cur >= 0 ? camFocus(cur) : introCam(camOverview(), enterK), hoFor(cur));
     if (cur >= 0) { panel.inert = false; panel.dataset.open = 'true'; }
