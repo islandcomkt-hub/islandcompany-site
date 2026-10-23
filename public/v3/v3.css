@@ -709,3 +709,4 @@ html.v3-motion .ab.blk{clip-path:none!important}
 @keyframes rocket{0%,100%{translate:0 0;rotate:0deg}20%{translate:2px -6px;rotate:-6deg}40%{translate:-2px -14px;rotate:4deg}60%{translate:1px -8px;rotate:-3deg}80%{translate:0 -3px;rotate:2deg}}
 @keyframes tap{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-6px) scale(1.05)}55%{transform:translateY(2px) scale(.92)}}
 @media (prefers-reduced-motion:reduce){.stk,.stk.circ b{animation:none!important}}
+@media (min-width:821px){.stk.circ{right:30%;top:3%}.stk.s2{right:5%;top:20%}}
