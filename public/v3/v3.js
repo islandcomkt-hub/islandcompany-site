@@ -115,23 +115,23 @@
   (function () {
     var box = document.getElementById('tm-rows'); if (!box) return;
     var T = [
-      ['Marina A.', 'Landing page', 'Eu precisava explicar meu serviço sem aquele site cheio de informação solta. O resultado ficou claro e com um caminho fácil para entrar em contato.', 5],
-      ['Rafael M.', 'Tráfego pago', 'Gostei de acompanhar o raciocínio das campanhas. As revisões e os próximos passos ficaram muito mais fáceis de entender.', 5],
-      ['Camila R.', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. Curti demais o cuidado com as cores e o jeito de organizar cada assunto.', 5],
-      ['Lucas F.', 'Edição de vídeo', 'O corte deu outro ritmo ao material. Legendas bem colocadas e transições na medida.', 5],
-      ['Beatriz S.', 'Gestão de Instagram', 'Ter um calendário e uma linha de comunicação ajudou a organizar a rotina. As sugestões fizeram sentido para a marca.', 4],
-      ['Diego P.', 'Site institucional', 'O site ficou rápido no celular e os clientes passaram a chegar já sabendo o que eu faço.', 5],
-      ['Juliana T.', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Agora tudo conversa.', 5],
-      ['André L.', 'Tráfego pago', 'Os relatórios são simples de ler e eu sei exatamente para onde está indo cada real.', 5],
-      ['Patrícia N.', 'Vídeos para anúncios', 'A gravação foi leve e o resultado ficou natural. Os vídeos já estão rodando nos anúncios.', 5],
-      ['Felipe C.', 'Estratégia', 'O diagnóstico mostrou o que fazer primeiro. Saí da reunião com um plano claro.', 5],
-      ['Larissa V.', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram muito mais organizados.', 5],
-      ['Gustavo R.', 'Conteúdo', 'Finalmente tenho constância nas redes sem precisar pensar em tudo sozinho.', 4]
+      ['Marina A.', 'f1', 'Landing page', 'Eu precisava explicar meu serviço sem aquele site cheio de informação solta. O resultado ficou claro e com um caminho fácil para entrar em contato.', 5],
+      ['Rafael M.', 'm1', 'Tráfego pago', 'Gostei de acompanhar o raciocínio das campanhas. As revisões e os próximos passos ficaram muito mais fáceis de entender.', 5],
+      ['Camila R.', 'f2', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. Curti demais o cuidado com as cores e o jeito de organizar cada assunto.', 5],
+      ['Lucas F.', 'm2', 'Edição de vídeo', 'O corte deu outro ritmo ao material. Legendas bem colocadas e transições na medida.', 5],
+      ['Beatriz S.', 'f3', 'Gestão de Instagram', 'Ter um calendário e uma linha de comunicação ajudou a organizar a rotina. As sugestões fizeram sentido para a marca.', 4],
+      ['Diego P.', 'm3', 'Site institucional', 'O site ficou rápido no celular e os clientes passaram a chegar já sabendo o que eu faço.', 5],
+      ['Juliana T.', 'f4', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Agora tudo conversa.', 5],
+      ['André L.', 'm4', 'Tráfego pago', 'Os relatórios são simples de ler e eu sei exatamente para onde está indo cada real.', 5],
+      ['Patrícia N.', 'f5', 'Vídeos para anúncios', 'A gravação foi leve e o resultado ficou natural. Os vídeos já estão rodando nos anúncios.', 5],
+      ['Felipe C.', 'm5', 'Estratégia', 'O diagnóstico mostrou o que fazer primeiro. Saí da reunião com um plano claro.', 5],
+      ['Larissa V.', 'f6', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram muito mais organizados.', 5],
+      ['Gustavo R.', 'm6', 'Conteúdo', 'Finalmente tenho constância nas redes sem precisar pensar em tudo sozinho.', 4]
     ];
     var P = [['#FF7417', '#B5179E'], ['#7B3FE4', '#31D6C2'], ['#FF987F', '#7B3FE4'], ['#31D6C2', '#4B1DB5'], ['#FFB347', '#FF7417'], ['#B99AF5', '#4B1DB5']];
     function card(t, i) {
-      var ini = t[0].split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2), c = P[i % P.length];
-      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><span class="tm-av" style="--a1:' + c[0] + ';--a2:' + c[1] + '" aria-hidden="true">' + ini + '</span><span><b>' + t[0] + '</b><small>' + t[1] + ' · exemplo</small></span><span class="tm-st" aria-label="' + t[3] + ' de 5 estrelas">' + '★★★★★'.slice(0, t[3]) + '</span></div></article>';
+      t = [t[0], t[2], t[3], t[4], t[1]];
+      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><img class="tm-av" src="/assets/faces/' + t[4] + '.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>' + t[0] + '</b><small>' + t[1] + ' · exemplo</small></span><span class="tm-st" aria-label="' + t[3] + ' de 5 estrelas">' + '★★★★★'.slice(0, t[3]) + '</span></div></article>';
     }
     function row(list, cls) { var h = list.map(card).join(''); return '<div class="tm-row ' + cls + '">' + h + h.replace(/<article class="tm">/g, '<article class="tm" aria-hidden="true">') + '</div>'; }
     box.innerHTML = row(T.slice(0, 6), 'l') + row(T.slice(6), 'r');
