@@ -105,6 +105,19 @@
     if (row) row.style.perspective = '900px';
   })();
 
+  /* adesivos do final: seguem o mouse de leve e dá pra arrastar */
+  (function () {
+    var sec = document.querySelector('.fin2'); if (!sec || RM) return;
+    var stks = [].slice.call(sec.querySelectorAll('.stk'));
+    sec.addEventListener('pointermove', function (e) { var r = sec.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1; stks.forEach(function (s) { s.style.setProperty('--px', x.toFixed(3)); s.style.setProperty('--py', y.toFixed(3)); }); });
+    stks.forEach(function (s) {
+      var sx, sy, ox = 0, oy = 0, dragging = false;
+      s.addEventListener('pointerdown', function (e) { dragging = true; sx = e.clientX - ox; sy = e.clientY - oy; s.setPointerCapture(e.pointerId); s.style.cursor = 'grabbing'; s.style.zIndex = 5; });
+      s.addEventListener('pointermove', function (e) { if (!dragging) return; ox = e.clientX - sx; oy = e.clientY - sy; s.style.translate = ox + 'px ' + oy + 'px'; s.style.animationPlayState = 'paused'; });
+      s.addEventListener('pointerup', function () { dragging = false; s.style.cursor = ''; });
+    });
+  })();
+
   /* ISLAND: cada letra abre o significado */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), box = document.getElementById('isl-mean');
