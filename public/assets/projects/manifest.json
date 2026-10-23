@@ -89,6 +89,26 @@
       "group": "Veterinária",
       "description": "Protótipo com apresentação de serviços veterinários, solicitação de agendamento e acesso ao portal do tutor.",
       "url": "https://marinelli.islandcompany.space"
+    },
+    {
+      "id": "letnacif",
+      "name": "Dra. Letícia Nacife",
+      "category": "hub",
+      "label": "Pediatria · agendamento",
+      "group": "Saúde",
+      "description": "Página de agendamento da pediatra com atendimento pelo WhatsApp.",
+      "url": "https://letnacif.islandcompany.space",
+      "img": "https://letnacif.islandcompany.space/assets/og-image.jpg"
+    },
+    {
+      "id": "larissa",
+      "name": "Larissa Lemos",
+      "category": "hub",
+      "label": "Psicologia infantil",
+      "group": "Saúde",
+      "description": "Apresentação da psicóloga infantil e canais de atendimento.",
+      "url": "https://larissa.islandcompany.space",
+      "img": "https://larissa.islandcompany.space/assets/hero-poster.jpg"
     }
   ],
   "unavailable": [

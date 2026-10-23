@@ -1,0 +1,20 @@
+.ts-overlay{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;perspective:1400px;overscroll-behavior:contain;touch-action:none}
+.ts-back{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 50%,rgba(20,8,40,.72),rgba(5,2,12,.92));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.ts-row{position:relative;display:flex;gap:clamp(14px,2vw,28px);align-items:center;justify-content:center;transform-style:preserve-3d;padding:0 20px}
+.ts-slot{transform-style:preserve-3d;transform:translate3d(calc(var(--px,0)*var(--d,0)*1px),calc(var(--py,0)*var(--d,0)*.7px),0) rotateY(calc(var(--px,0)*7deg)) rotateX(calc(var(--py,0)*-6deg));transition:transform .18s ease-out}
+.ts-card{position:relative;display:block;width:min(29vw,380px);aspect-ratio:1/1.12;border-radius:16px;overflow:hidden;color:#fff;text-decoration:none;background:#120a22;box-shadow:0 40px 70px -30px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.22);will-change:transform,opacity;outline:none}
+.ts-card:focus-visible{box-shadow:0 0 0 3px #ff7417,0 40px 70px -30px rgba(0,0,0,.85)}
+.ts-card img{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;object-position:top center;transform:translate3d(calc(var(--px,0)*-14px),calc(var(--py,0)*-10px),0);transition:transform .18s ease-out}
+.ts-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(5,2,12,.92))}
+.ts-cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:16px 18px 18px;display:grid;gap:4px}
+.ts-cap small{font:600 .68rem/1 inherit;letter-spacing:.14em;text-transform:uppercase;color:#ff9a52}
+.ts-cap b{font-size:clamp(1.05rem,1.6vw,1.35rem);line-height:1.1}
+.ts-cap i{font-style:normal;font-size:.8rem;opacity:.8}
+.ts-x{position:absolute;top:max(14px,env(safe-area-inset-top));right:14px;z-index:3;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(10,4,20,.6);color:#fff;font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.ts-hint{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;font-size:.78rem;letter-spacing:.08em;color:rgba(255,255,255,.6);pointer-events:none}
+@media (max-width:760px){
+  .ts-row{flex-direction:column;gap:12px}
+  .ts-card{width:min(80vw,340px);aspect-ratio:1.7/1}
+  .ts-cap{padding:12px 14px}
+}
+@media (max-width:760px){.ts-card::after{background:linear-gradient(180deg,rgba(5,2,12,.05) 25%,rgba(5,2,12,.9))}.ts-cap small{font-size:.6rem}}
