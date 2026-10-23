@@ -570,3 +570,8 @@ html:not(.v3-still) .hx-swoosh path{animation:hxDraw .9s ease-out 2.6s forwards}
 .hero h1.h1x{gap:.04em}
 .hx-swoosh{bottom:-.18em}
 @media (max-width:820px){.hx-b{font-size:14.5vw}}
+/* destaque: Bebas Neue em maiúsculas, peso médio e elegante */
+:root{--sea:'Bebas Neue','Archivo Narrow','Archivo',sans-serif}
+.hx-b{font:400 clamp(4.4rem,10vw,9.2rem)/.86 var(--sea);letter-spacing:.015em;text-transform:uppercase}
+.hx-s{letter-spacing:.18em}
+@media (max-width:820px){.hx-b{font-size:21vw}}
