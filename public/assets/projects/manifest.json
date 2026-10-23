@@ -97,8 +97,7 @@
       "label": "Pediatria · agendamento",
       "group": "Saúde",
       "description": "Página de agendamento da pediatra com atendimento pelo WhatsApp.",
-      "url": "https://letnacif.islandcompany.space",
-      "img": "https://letnacif.islandcompany.space/assets/og-image.jpg"
+      "url": "https://letnacif.islandcompany.space"
     },
     {
       "id": "larissa",
@@ -107,8 +106,7 @@
       "label": "Psicologia infantil",
       "group": "Saúde",
       "description": "Apresentação da psicóloga infantil e canais de atendimento.",
-      "url": "https://larissa.islandcompany.space",
-      "img": "https://larissa.islandcompany.space/assets/hero-poster.jpg"
+      "url": "https://larissa.islandcompany.space"
     }
   ],
   "unavailable": [

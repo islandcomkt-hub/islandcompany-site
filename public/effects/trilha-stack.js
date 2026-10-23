@@ -4,6 +4,28 @@
     {id:'trilhalp',t:'Trilha LP',l:'Landing page',u:'https://trilhalp.islandcompany.space'},
     {id:'tm',t:'TM · Identidade Trilha',l:'Identidade digital',u:'https://tm.islandcompany.space'}
   ];
+
+  var LAYERS=[{id:'tm',y:-40,z:-70,b:.62},{id:'trilhalp',y:-20,z:-35,b:.82}],gSig='',gCard=null;
+  function stackCard(){return document.querySelector('.circular-carousel__card[data-cc-index="0"]')}
+  function cardRect(c){var ts=c.querySelectorAll(':scope > .circular-carousel__tile'),l=1e9,t=1e9,r=-1e9,b=-1e9;
+    for(var i=0;i<ts.length;i++){var q=ts[i].getBoundingClientRect();l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)}
+    return ts.length?{left:l,top:t,width:r-l,height:b-t}:c.getBoundingClientRect()}
+  function syncGhosts(){
+    var c=stackCard();if(!c)return;
+    var ts=c.querySelectorAll(':scope > .circular-carousel__tile'),sig='';
+    for(var i=0;i<ts.length;i++)sig+=ts[i].getAttribute('style')+'|';
+    if(c===gCard&&sig===gSig&&c.querySelector('.ts-ghost'))return;
+    gCard=c;gSig=sig;
+    c.querySelectorAll('.ts-ghost,.ts-badge').forEach(function(n){n.remove()});
+    LAYERS.forEach(function(L){
+      var g=document.createElement('div');g.className='ts-ghost';g.setAttribute('aria-hidden','true');
+      g.style.transform='translate3d(0,'+L.y+'px,'+L.z+'px)';
+      for(var i=0;i<ts.length;i++){var k=ts[i].cloneNode(true);k.querySelectorAll('.ts-badge').forEach(function(n){n.remove()});var im=k.querySelector('img');if(im){im.src='/assets/projects/'+L.id+'-carousel.webp';im.style.filter='brightness('+L.b+')'}g.appendChild(k)}
+      c.insertBefore(g,c.firstChild);
+    });
+    if(ts.length){var bd=document.createElement('span');bd.className='ts-badge';bd.setAttribute('aria-hidden','true');bd.textContent='3 sites';ts[0].appendChild(bd)}
+  }
+  setInterval(syncGhosts,500);
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches, open=null;
   function el(tag,cls,parent){var e=document.createElement(tag);if(cls)e.className=cls;if(parent)parent.appendChild(e);return e}
   function openStack(opts){
@@ -21,8 +43,9 @@
     });
     var x=el('button','ts-x',o);x.type='button';x.setAttribute('aria-label','Fechar');x.textContent='✕';
     el('div','ts-hint',o).textContent='Toque fora para voltar';
-    var anims=[],closing=false,origin=opts.origin||{left:innerWidth/2-100,top:innerHeight/2-100,width:200,height:200};
+    var sc0=stackCard(),anims=[],closing=false,origin=(sc0&&cardRect(sc0))||opts.origin||{left:innerWidth/2-100,top:innerHeight/2-100,width:200,height:200};
     var ox=origin.left+origin.width/2, oy=origin.top+origin.height/2;
+    if(sc0)sc0.style.visibility='hidden';
     var ba=back.animate([{opacity:0},{opacity:1}],{duration:reduce?1:520,easing:'ease-out',fill:'both'});anims.push(ba);
     cards.forEach(function(c,i){
       var r=c.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
@@ -37,7 +60,7 @@
     function close(fast){
       if(closing)return;closing=true;document.removeEventListener('keydown',key,true);
       var done=0,n=anims.length;
-      function fin(){if(++done<n)return;o.remove();open=null;document.documentElement.style.overflow=prevOv;
+      function fin(){if(++done<n)return;o.remove();if(sc0)sc0.style.visibility='';open=null;document.documentElement.style.overflow=prevOv;
         try{prevFocus&&prevFocus.focus&&prevFocus.focus({preventScroll:true})}catch(e){}
         opts.onClose&&opts.onClose()}
       anims.forEach(function(a){a.onfinish=null;a.reverse();a.finished.then(fin,fin)});
