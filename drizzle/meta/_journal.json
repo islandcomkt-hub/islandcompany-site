@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791032954975,
+      "tag": "0000_old_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791059697118,
+      "tag": "0001_colorful_arachne",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791060510809,
+      "tag": "0002_supreme_paper_doll",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1791201951402,
+      "tag": "0003_lush_black_crow",
+      "breakpoints": true
+    }
+  ]
+}

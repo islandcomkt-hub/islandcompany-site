@@ -1,0 +1,158 @@
+{
+  "phrases": [
+    "Talvez seja atrair mais clientes",
+    "Talvez seja vender mais",
+    "Talvez seja fortalecer sua marca",
+    "Talvez seja organizar a casa",
+    "Talvez você ainda nem saiba",
+    "É exatamente por isso que estamos aqui"
+  ],
+  "steps": [
+    {
+      "key": "contact",
+      "name": "Embarque",
+      "tech": "Identificação",
+      "title": "Antes de partir, precisamos saber quem está a bordo",
+      "type": "contact"
+    },
+    {
+      "key": "stage",
+      "name": "Ponto de partida",
+      "tech": "Estágio do negócio",
+      "title": "Em que momento seu negócio está?",
+      "type": "single",
+      "options": [
+        "Estou começando agora (0–6 meses)",
+        "Já tenho um negócio estruturado (1–3 anos)",
+        "Empresa consolidada (+3 anos)",
+        "Startup em fase de crescimento",
+        "Franquia ou rede",
+        "Outro cenário"
+      ]
+    },
+    {
+      "key": "objectives",
+      "name": "Destino",
+      "tech": "Objetivo principal",
+      "title": "O que seu negócio mais precisa agora?",
+      "type": "multi",
+      "max": 3,
+      "options": [
+        "Atrair mais clientes",
+        "Aumentar vendas",
+        "Fortalecer minha marca",
+        "Lançar um produto ou serviço",
+        "Melhorar minha presença digital",
+        "Organizar meu crescimento",
+        "Melhorar meu posicionamento",
+        "Estruturar aquisição de clientes",
+        "Outro"
+      ]
+    },
+    {
+      "key": "areas",
+      "name": "Arquipélago",
+      "tech": "Ilhas de interesse",
+      "title": "Quais áreas você acredita que podem ajudar seu negócio?",
+      "type": "multi",
+      "options": [
+        "Performance",
+        "Branding",
+        "Conteúdo",
+        "Tech",
+        "Estratégia",
+        "Arquipélago Completo"
+      ],
+      "descriptions": [
+        "Tráfego pago e aquisição de clientes",
+        "Identidade e percepção de marca",
+        "Narrativas e presença digital",
+        "Sites, sistemas e automação",
+        "Direção e planejamento",
+        "Todas as especializações conectadas"
+      ]
+    },
+    {
+      "key": "history",
+      "name": "Águas percorridas",
+      "tech": "Histórico",
+      "title": "O que você já tentou até aqui?",
+      "type": "single",
+      "options": [
+        "Nunca fiz marketing digital",
+        "Já tentei, mas sem resultados",
+        "Já tenho ações ativas com algum resultado",
+        "Tenho equipe ou agência atual e quero evoluir",
+        "Tenho estrutura interna de marketing",
+        "Outro"
+      ]
+    },
+    {
+      "key": "investment",
+      "name": "Recursos",
+      "tech": "Investimento mensal",
+      "title": "Quanto pretende investir mensalmente em crescimento?",
+      "type": "single",
+      "options": [
+        "Até R$ 2.000/mês",
+        "R$ 2.000 a R$ 5.000/mês",
+        "R$ 5.000 a R$ 15.000/mês",
+        "R$ 15.000 a R$ 50.000/mês",
+        "Acima de R$ 50.000/mês"
+      ]
+    },
+    {
+      "key": "start",
+      "name": "Partida",
+      "tech": "Prazo de início",
+      "title": "Quando pretende começar?",
+      "type": "single",
+      "options": [
+        "Imediato / essa semana",
+        "Próximas 2 semanas",
+        "Próximo mês",
+        "Nos próximos 3 meses",
+        "Ainda estou pesquisando"
+      ]
+    },
+    {
+      "key": "expectations",
+      "name": "Horizonte",
+      "tech": "Expectativa",
+      "title": "O que você espera como resultado?",
+      "type": "multi",
+      "options": [
+        "Atrair mais clientes",
+        "Aumentar minhas vendas",
+        "Melhorar meu posicionamento",
+        "Fortalecer minha marca",
+        "Criar uma presença digital profissional",
+        "Estruturar minha aquisição de clientes",
+        "Aumentar minha autoridade",
+        "Organizar meu marketing",
+        "Escalar o que já funciona",
+        "Outro objetivo"
+      ]
+    },
+    {
+      "key": "decision",
+      "name": "Comando",
+      "tech": "Tomada de decisão",
+      "title": "Como essa decisão acontece na sua empresa?",
+      "type": "single",
+      "options": [
+        "Sou o único decisor",
+        "Decido com sócios/diretoria",
+        "Preciso de aprovação superior",
+        "Estou apenas pesquisando opções"
+      ]
+    },
+    {
+      "key": "review",
+      "name": "Mapa completo",
+      "tech": "Validação final",
+      "title": "Confira sua rota",
+      "type": "review"
+    }
+  ]
+}

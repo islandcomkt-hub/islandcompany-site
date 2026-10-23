@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /base
+Disallow: /api/
+Disallow: /signin-with-chatgpt
+Disallow: /signout-with-chatgpt
+Disallow: /callback
+
+Sitemap: https://islandcompany.space/sitemap.xml

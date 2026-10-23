@@ -1,0 +1,106 @@
+{
+  "capturedOn": "2026-10-18",
+  "desktop": {
+    "width": 1440,
+    "height": 1000
+  },
+  "mobile": {
+    "width": 390,
+    "height": 844
+  },
+  "projects": [
+    {
+      "id": "trilha",
+      "name": "Trilha Motos",
+      "category": "digital",
+      "label": "Catálogo digital",
+      "group": "Trilha Motos",
+      "description": "Catálogo de peças e equipamentos, busca por moto e carrinho com encaminhamento para atendimento.",
+      "url": "https://trilha.islandcompany.space"
+    },
+    {
+      "id": "trilhalp",
+      "name": "Trilha LP",
+      "category": "hub",
+      "label": "Landing page",
+      "group": "Trilha Motos",
+      "description": "Acessos para peças, pneus e oficina, com seleção de moto para organizar o pedido pelo WhatsApp.",
+      "url": "https://trilhalp.islandcompany.space"
+    },
+    {
+      "id": "tm",
+      "name": "TM · Identidade Trilha",
+      "category": "marca",
+      "label": "Identidade visual",
+      "group": "Trilha Motos",
+      "description": "Apresentação da marca, suas versões, cores e aplicações em fachadas, motos, uniformes e materiais.",
+      "url": "https://tm.islandcompany.space"
+    },
+    {
+      "id": "brothers",
+      "name": "Brothers",
+      "category": "digital",
+      "label": "Site de serviços",
+      "group": "Automotivo",
+      "description": "Som, multimídia, iluminação e acessórios automotivos, com consulta por veículo e contato para orçamento.",
+      "url": "https://brothers.islandcompany.space"
+    },
+    {
+      "id": "duhype",
+      "name": "Duhype HUB",
+      "category": "hub",
+      "label": "HUB comercial",
+      "group": "Streetwear",
+      "description": "Kits de roupas com fotos, consultas pelo WhatsApp e acesso às redes sociais e à loja.",
+      "url": "https://duhype.islandcompany.space"
+    },
+    {
+      "id": "clinica",
+      "name": "Clínica · Dra. Caticilene",
+      "category": "hub",
+      "label": "Presença profissional",
+      "group": "Saúde",
+      "description": "Apresentação profissional com acessos para consulta, conteúdos, podcast e mentoria.",
+      "url": "https://clinica.islandcompany.space"
+    },
+    {
+      "id": "supra",
+      "name": "Supra",
+      "category": "hub",
+      "label": "HUB de serviços",
+      "group": "Telecomunicações",
+      "description": "Uma página de acesso aos planos, atendimento, aplicativos e canais da Supranet.",
+      "url": "https://supra.islandcompany.space"
+    },
+    {
+      "id": "landingpage",
+      "name": "Island HUB",
+      "category": "hub",
+      "label": "HUB da marca",
+      "group": "Island Company",
+      "description": "O ponto de partida para conhecer a Island, conversar com a equipe e explorar o LAB.",
+      "url": "https://landingpage.islandcompany.space"
+    },
+    {
+      "id": "marinelli",
+      "name": "Marinelli",
+      "category": "prototipo",
+      "label": "Protótipo",
+      "group": "Veterinária",
+      "description": "Protótipo com apresentação de serviços veterinários, solicitação de agendamento e acesso ao portal do tutor.",
+      "url": "https://marinelli.islandcompany.space"
+    }
+  ],
+  "unavailable": [
+    {
+      "name": "Hugo Ferreira",
+      "url": "https://hugo-ffereiro.islandcompany.space",
+      "status": "DEPLOYMENT_NOT_FOUND"
+    },
+    {
+      "name": "Island anterior",
+      "url": "https://v0-island-hazel.vercel.app",
+      "status": "DEPLOYMENT_NOT_FOUND"
+    }
+  ]
+}
