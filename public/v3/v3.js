@@ -2,7 +2,6 @@
   var ONB = 'https://onboarding.islandcompany.space';
   var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
-  if (!RM) root.classList.add('cine');
 
   /* ---------- entradas entre seções ---------- */
   if ('IntersectionObserver' in window && !RM) {

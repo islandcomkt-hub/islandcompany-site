@@ -587,30 +587,30 @@ html:not(.v3-still) .hx-swoosh path{animation:hxDraw .9s ease-out 2.6s forwards}
 html:not(.v3-still) .hx-grow,html:not(.v3-still) .hx-sail,html:not(.v3-still) .hx-need,html:not(.v3-still) .hx-compass{animation:none}
 .hero h1.h1x{perspective:900px}
 .hx-s,.hx-b{will-change:transform,opacity,filter}
-html.cine .hx-grow,html.cine .hx-need{animation:cTrack .9s cubic-bezier(.16,1,.3,1) both}
-html.cine .hx-sail,html.cine .hx-compass{transform-origin:50% 100%;animation:cFlip 1.05s cubic-bezier(.16,1,.3,1) both}
-html.cine .hx-grow{animation-delay:.05s}
-html.cine .hx-sail{animation-delay:.14s}
-html.cine .hx-need{animation-delay:.3s}
-html.cine .hx-compass{animation-delay:.4s}
+html.cine-go .hx-grow,html.cine-go .hx-need{animation:cTrack .9s cubic-bezier(.16,1,.3,1) both}
+html.cine-go .hx-sail,html.cine-go .hx-compass{transform-origin:50% 100%;animation:cFlip 1.05s cubic-bezier(.16,1,.3,1) both}
+html.cine-go .hx-grow{animation-delay:.05s}
+html.cine-go .hx-sail{animation-delay:.14s}
+html.cine-go .hx-need{animation-delay:.3s}
+html.cine-go .hx-compass{animation-delay:.4s}
 @keyframes cTrack{from{opacity:0;letter-spacing:.7em;filter:blur(8px)}to{opacity:1;filter:none}}
 @keyframes cFlip{from{opacity:0;transform:translateY(.45em) rotateX(-85deg) scale(1.08);filter:blur(10px)}60%{opacity:1;filter:none}to{opacity:1;transform:none;filter:none}}
 /* brilho que passa nas palavras grandes */
 .hx-b{background:linear-gradient(100deg,currentColor 40%,#fff 50%,currentColor 60%) 200% 0/250% 100% no-repeat;-webkit-background-clip:text;background-clip:text}
-html.cine .hx-sail,html.cine .hx-compass{-webkit-text-fill-color:transparent;animation-name:cFlip,cShine;animation-duration:1.05s,1.4s;animation-delay:.14s,1.25s;animation-fill-mode:both,both;animation-timing-function:cubic-bezier(.16,1,.3,1),ease-in-out}
-html.cine .hx-compass{animation-delay:.4s,1.45s;text-shadow:none}
+html.cine-go .hx-sail,html.cine-go .hx-compass{-webkit-text-fill-color:transparent;animation-name:cFlip,cShine;animation-duration:1.05s,1.4s;animation-delay:.14s,1.25s;animation-fill-mode:both,both;animation-timing-function:cubic-bezier(.16,1,.3,1),ease-in-out}
+html.cine-go .hx-compass{animation-delay:.4s,1.45s;text-shadow:none}
 .hx-sail{color:var(--tx)}
 @keyframes cShine{from{background-position:200% 0}to{background-position:-60% 0}}
 /* subtexto, botões e seta do topo */
-html.cine .hero p.l{animation:cRise .8s cubic-bezier(.16,1,.3,1) .62s both}
-html.cine .hero .cta .btn{animation:cPop .8s cubic-bezier(.2,1.3,.4,1) both}
-html.cine .hero .cta .btn:nth-child(1){animation-delay:.78s}
-html.cine .hero .cta .btn:nth-child(2){animation-delay:.88s}
-html.cine .scroll-cue{animation:cRise .8s ease-out 1.1s both}
+html.cine-go .hero p.l{animation:cRise .8s cubic-bezier(.16,1,.3,1) .62s both}
+html.cine-go .hero .cta .btn{animation:cPop .8s cubic-bezier(.2,1.3,.4,1) both}
+html.cine-go .hero .cta .btn:nth-child(1){animation-delay:.78s}
+html.cine-go .hero .cta .btn:nth-child(2){animation-delay:.88s}
+html.cine-go .scroll-cue{animation:cRise .8s ease-out 1.1s both}
 .hero .cta{perspective:800px}
 @keyframes cRise{from{opacity:0;transform:translateY(22px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
 @keyframes cPop{from{opacity:0;transform:translateY(26px) rotateX(-55deg) scale(.9)}to{opacity:1;transform:none}}
-html.cine .hero .cta .btn.onb{animation:cPop .8s cubic-bezier(.2,1.3,.4,1) .78s both,onbNudge 3.6s ease-in-out 2s infinite}
+html.cine-go .hero .cta .btn.onb{animation:cPop .8s cubic-bezier(.2,1.3,.4,1) .78s both,onbNudge 3.6s ease-in-out 2s infinite}
 /* elementos da Island no topo: farol, rosa dos ventos, ondas, gaivotas */
 .hx-amb{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 .hero .w{z-index:2}
@@ -638,11 +638,11 @@ html.v3-motion .btn.cine-x{transform:perspective(700px) translateY(28px) rotateX
 html.v3-motion .btn.cine-x.cine-in{transform:none;transition-timing-function:cubic-bezier(.2,1.3,.4,1)}
 .ab .ln>span{transform:none}
 @media (prefers-reduced-motion:reduce){html.v3-motion .cine-x,html.v3-motion [data-up]{opacity:1!important;transform:none!important;filter:none!important}}
-html.cine .hx-b{text-shadow:none}
+html.cine-go .hx-b{text-shadow:none}
 .hx-b{background:none!important;-webkit-text-fill-color:currentColor!important}
-html.cine .hx-sail,html.cine .hx-compass{animation-name:cFlip,cGlow}
+html.cine-go .hx-sail,html.cine-go .hx-compass{animation-name:cFlip,cGlow}
 @keyframes cGlow{0%,100%{text-shadow:none}40%{text-shadow:0 0 28px rgba(255,255,255,.55),0 0 2px #fff}}
-html.cine .hx-compass{--gc:rgba(255,140,60,.8)}
+html.cine-go .hx-compass{--gc:rgba(255,140,60,.8)}
 
 /* ===== rodada 8 ===== */
 /* volta a abertura de seções original (subir e aparecer) */
@@ -653,7 +653,7 @@ html.v3-motion .btn.cine-x{transform:translateY(28px) scale(.94)}
 /* topo sem rosa, sem farol e sem ondas; seta centralizada */
 .hx-beam,.hx-rose,.hx-waves{display:none!important}
 .scroll-cue{left:0;right:0;margin:0 auto;width:max-content;transform:none}
-html.cine .scroll-cue{animation:cRise .8s ease-out 1.1s both}
+html.cine-go .scroll-cue{animation:cRise .8s ease-out 1.1s both}
 .cue-d{display:none}
 @media (min-width:821px) and (hover:hover){.cue-m{display:none}.cue-d{display:inline}}
 /* mini card "+ contatos" animado */
@@ -710,3 +710,7 @@ html.v3-motion .ab.blk{clip-path:none!important}
 @keyframes tap{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-6px) scale(1.05)}55%{transform:translateY(2px) scale(.92)}}
 @media (prefers-reduced-motion:reduce){.stk,.stk.circ b{animation:none!important}}
 @media (min-width:821px){.stk.circ{right:30%;top:3%}.stk.s2{right:5%;top:20%}}
+
+/* topo: espera a fonte carregar antes de animar (sem pulo na abertura) */
+html.cine-wait .hx-s,html.cine-wait .hx-b,html.cine-wait .hero p.l,html.cine-wait .hero .cta .btn,html.cine-wait .scroll-cue{opacity:0}
+.hero .rv{transition:none}
