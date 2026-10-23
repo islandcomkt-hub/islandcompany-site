@@ -5,7 +5,7 @@
     {id:'tm',t:'TM · Identidade Trilha',l:'Identidade digital',u:'https://tm.islandcompany.space'}
   ];
 
-  var LAYERS=[{id:'tm',y:-40,z:-70,b:.62},{id:'trilhalp',y:-20,z:-35,b:.82}],gSig='',gCard=null;
+  var LAYERS=[{id:'tm',y:-22,z:-36,x:-7,r:-3.2,b:.6},{id:'trilhalp',y:-11,z:-18,x:5,r:2.1,b:.8}],gSig='',gCard=null;
   function stackCard(){return document.querySelector('.circular-carousel__card[data-cc-index="0"]')}
   function cardRect(c){var ts=c.querySelectorAll(':scope > .circular-carousel__tile'),l=1e9,t=1e9,r=-1e9,b=-1e9;
     for(var i=0;i<ts.length;i++){var q=ts[i].getBoundingClientRect();l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)}
@@ -19,7 +19,7 @@
     c.querySelectorAll('.ts-ghost,.ts-badge').forEach(function(n){n.remove()});
     LAYERS.forEach(function(L){
       var g=document.createElement('div');g.className='ts-ghost';g.setAttribute('aria-hidden','true');
-      g.style.transform='translate3d(0,'+L.y+'px,'+L.z+'px)';
+      g.style.transform='translate3d('+L.x+'px,'+L.y+'px,'+L.z+'px) rotateZ('+L.r+'deg)';
       for(var i=0;i<ts.length;i++){var k=ts[i].cloneNode(true);k.querySelectorAll('.ts-badge').forEach(function(n){n.remove()});var im=k.querySelector('img');if(im){im.src='/assets/projects/'+L.id+'-carousel.webp';im.style.filter='brightness('+L.b+')'}g.appendChild(k)}
       c.insertBefore(g,c.firstChild);
     });
