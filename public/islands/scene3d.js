@@ -425,9 +425,9 @@ export function createScene(canvas, data, opts) {
     const is = islands[i], c = is.grp.position, el = (mobile ? 27 : 24) * Math.PI / 180, pts = [];
     for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; pts.push([c.x + Math.cos(a) * 11, 0, c.z + Math.sin(a) * 11]); }
     pts.push([c.x, 12, c.z]); const d0 = api.dock(i); pts.push([d0.x + is.t[0] * 3, 0, d0.z + is.t[1] * 3]); pts.push([d0.x - is.t[0] * 3, 0, d0.z - is.t[1] * 3]);
-    const off = mobile ? 0 : 0.18, st = { x: c.x + is.u[0] * 1.2, y: 3.3, z: c.z + is.u[1] * 1.2, az: is.phi * 0.9, el, off, offy: mobile ? (1 - vfrac) / 2 : 0 };
-    // com deslocamento horizontal (painel à direita) o quadro útil é ~64% da largura
-    st.d = fitD(st, aspect, pts, mobile ? [0.95, vfrac * 0.9, vfrac * 0.9] : [0.64, 0.86, 0.86]); return st;
+    // painel em faixa horizontal embaixo (desktop): ilha centralizada na parte de cima do quadro
+    const vf = mobile ? vfrac : 0.66, st = { x: c.x + is.u[0] * 1.2, y: 3.3, z: c.z + is.u[1] * 1.2, az: is.phi * 0.9, el, off: 0, offy: (1 - vf) / 2 };
+    st.d = fitD(st, aspect, pts, mobile ? [0.95, vf * 0.9, vf * 0.9] : [0.86, vf * 0.86, vf * 0.86]); return st;
   };
   api.mixCam = function (a, b, t, lift, boatPos, follow) {
     const s = { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), z: lerp(a.z, b.z, t), d: lerp(a.d, b.d, t), az: lerp(a.az, b.az, t), el: lerp(a.el, b.el, t), off: lerp(a.off, b.off, t), offy: lerp(a.offy || 0, b.offy || 0, t) };

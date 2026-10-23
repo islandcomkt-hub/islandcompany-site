@@ -42,7 +42,9 @@
 
   /* ---------- medidas ---------- */
   function measure() {
-    mobile = MQ.matches; W = Math.round(root.clientWidth); HO = Math.round(W * (mobile ? 0.64 : 0.56)); HF = HO;
+    mobile = MQ.matches; W = Math.round(root.clientWidth); HO = Math.round(W * (mobile ? 0.64 : 0.56));
+    if (!mobile) { var sec = root.closest('section'), hd = sec && (sec.querySelector('.svc-head') || sec), off = hd ? root.getBoundingClientRect().top - hd.getBoundingClientRect().top : 0; HO = Math.round(Math.max(W * 0.36, Math.min(HO, innerHeight - 72 - 16 - off - 20))); }
+    HF = HO;
     if (canvas) canvas.style.height = HO + 'px';
   }
   function vfrac() { return 1; }
@@ -283,6 +285,7 @@
   }
   lastW = Math.round(root.clientWidth);
   if (window.ResizeObserver) new ResizeObserver(onResize).observe(root); else addEventListener('resize', onResize);
+  addEventListener('resize', function () { if (!mobile) onResize(); });
   if (MQ.addEventListener) MQ.addEventListener('change', onResize);
   if (RM.addEventListener) RM.addEventListener('change', function () { wake(); renderNow(); });
   window.addEventListener('pagehide', function () { tk++; });
