@@ -38,7 +38,7 @@
       var a=el('a','ts-card',slot);a.href=s.u;a.target='_blank';a.rel='noopener noreferrer';
       var im=el('img','',a);im.src='/assets/projects/'+s.id+'-carousel.webp';im.alt='';im.decoding='async';
       var c=el('span','ts-cap',a);el('small','',c).textContent='Trilha Motos';el('b','',c).textContent=s.t;el('i','',c).textContent=s.l+' ↗';
-      a.addEventListener('click',function(){setTimeout(function(){close(true)},60)});
+      a.addEventListener('click',function(ev){if(window.IslandPortfolio){ev.preventDefault();close(true);setTimeout(function(){window.IslandPortfolio.open(s.id)},380)}else setTimeout(function(){close(true)},60)});
       cards.push(a);slots.push(slot);
     });
     var x=el('button','ts-x',o);x.type='button';x.setAttribute('aria-label','Fechar');x.textContent='✕';

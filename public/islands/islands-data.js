@@ -14,7 +14,7 @@ window.ISLAND_DATA={
     "Criativos para anúncio",
     "Estrutura de funil"
    ],
-   "cta": "Falar sobre aquisição",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em tráfego pago e aquisição de clientes com a Island Performance. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [
@@ -33,7 +33,7 @@ window.ISLAND_DATA={
     "Aplicações para anúncios e vídeos",
     "Sistemas visuais para redes sociais"
    ],
-   "cta": "Falar sobre identidade",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em identidade visual e branding com a Island Brand. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [
@@ -52,7 +52,7 @@ window.ISLAND_DATA={
     "Personagens para anúncios e vídeos",
     "Aplicações em redes sociais"
    ],
-   "cta": "Falar sobre mascotes",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em criação de mascotes e personagens com a Island Characters. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [
@@ -71,7 +71,7 @@ window.ISLAND_DATA={
     "Vídeos para anúncios e autoridade",
     "Direção criativa e edição"
    ],
-   "cta": "Falar sobre vídeos",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em produção e gravação de vídeos com a Island Media. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [
@@ -98,7 +98,7 @@ window.ISLAND_DATA={
     "Mentoria estratégica",
     "Planejamento de crescimento"
    ],
-   "cta": "Falar sobre diagnóstico",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em diagnóstico e planejamento estratégico com a Island Strategy. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [
@@ -117,7 +117,7 @@ window.ISLAND_DATA={
     "Aplicações e e-commerce",
     "Automações e integrações"
    ],
-   "cta": "Falar sobre sites e automações",
+   "cta": "Começar agora",
    "message": "Olá, Island! Tenho interesse em sites, aplicações e automações com a Island Tech. Podemos conversar sobre meu projeto?",
    "showcaseUrl": null,
    "dock": [

@@ -86,7 +86,7 @@
   document.addEventListener('visibilitychange', function () { if (!document.hidden) wake(); });
 
   /* ---------- painel ---------- */
-  function ctaUrl(d) { return 'https://wa.me/' + D.whatsapp + '?text=' + encodeURIComponent(d.message); }
+  function ctaUrl(d) { return 'https://onboarding.islandcompany.space'; }
   function words(text, d0, step, cls) {
     return String(text).split(' ').map(function (w, k) { return '<span class="isw"><span style="--w:' + k + '">' + esc(w) + '</span></span>'; }).join(' ');
   }
@@ -107,7 +107,7 @@
     if (d.person) h += personCard(d, k++);
     h += '<p class="isl-d">' + words(d.description) + '</p>' +
       '<ul class="isl-ft pi" style="--i:' + (k += 6) + '">' + d.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>';
-    h += '<a class="btn p isl-cta pi" data-cta href="' + ctaUrl(d) + '" target="_blank" rel="noopener" style="--i:' + (k++ + 1) + '">' + esc(d.cta) + '</a>' +
+    h += '<a class="btn p isl-cta pi" data-cta href="' + ctaUrl(d) + '" style="--i:' + (k++ + 1) + '">' + esc(d.cta) + '</a>' +
       '<div class="isl-nav pi" style="--i:' + (k++ + 1) + '">' +
       '<button type="button" class="isl-nb" data-act="prev" aria-label="Ilha anterior: ' + esc(pv.name) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>' +
       '<div class="isl-dots" aria-hidden="true">' + D.islands.map(function (_, j) { return '<i' + (j === i ? ' class="on"' : '') + '></i>'; }).join('') + '</div>' +
@@ -289,6 +289,7 @@
 
   /* leitura para testes e diagnóstico (somente leitura) */
   window.IslandExplorer = {
+    go: function (i) { if (typeof i === 'string') i = D.islands.findIndex(function (d) { return d.id === i; }); if (i >= 0 && i < N) request(i); },
     get state() { return state; }, get current() { return cur; }, get ready() { return loaded; }, get failed() { return failed; },
     boat: function () { return sc ? { x: sc.boatState.x, z: sc.boatState.z, ry: sc.boatState.ry } : null; },
     camera: function () { return cam; }, wake: function () { return sc ? sc.wakeActive() : 0; }, get looping() { return !!raf; },
