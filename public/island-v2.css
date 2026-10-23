@@ -273,21 +273,30 @@ footer .logo img{width:140px}footer li a{display:inline-flex;min-height:44px;ali
 @media(max-width:700px){.carousel-stage{height:540px}#carousel-root{min-height:700px}.carousel-details{min-height:160px}.method-label{width:calc(100% - 94px);font-size:clamp(.75rem,3.25vw,.95rem);line-height:1.35}.method-panel h2{top:6%}.island-showcase .framer-mff36c p{font-size:14px!important}.island-showcase .framer-brcd4f{gap:12px!important}.testimonial-orbit-card{width:calc(100vw - 64px);max-width:360px}.testimonials-section{padding:65px 0}.testimonial-orbit{height:465px}.advancing-route{height:110px}}
 .island-showcase .framer-mff36c *, .island-showcase .framer-1dwaw9f *{color:#fff!important;--framer-text-color:#fff!important}
 @media(max-width:700px){.method-label{font-size:clamp(.85rem,3.65vw,1rem)}}
+/* Mobile performance and interaction refinement */
+.carousel-stage{height:500px}.carousel-details{min-height:0;padding-bottom:0}.carousel-gallery-note{margin:0 0 18px}#carousel-root{min-height:0}.portfolio-orbit{padding-bottom:60px}.portfolio-heading{gap:30px}
+.island-showcase .framer-x4pglf img{filter:none!important}.island-showcase .framer-1bdetov{box-shadow:none!important}.island-showcase .framer-oa0zo4-container{display:none!important}
+.testimonial-orbit{touch-action:pan-y;cursor:grab;user-select:none}.testimonial-orbit:active{cursor:grabbing}.testimonial-orbit-card{touch-action:pan-y}.testimonial-orbit-card:focus-visible{outline:2px solid #31d6c2}
+.mobile-bento{display:grid;grid-template-columns:1fr 1fr;gap:12px;touch-action:pan-y}
+.mobile-bento-card{position:relative;min-width:0;min-height:215px;border:1px solid #4e3c5b;border-radius:14px;overflow:hidden;background-size:cover;background-position:center;color:#fff;text-align:left;cursor:pointer;isolation:isolate;transition:filter .3s,background-position .4s;filter:saturate(.2)}
+.mobile-bento-card::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(transparent,rgba(9,3,19,.96) 65%)}
+.mobile-bento-card[aria-expanded="true"]{filter:saturate(1);background-position:55% center;border-color:#ff7417}
+.mobile-bento-copy{position:absolute;left:14px;right:14px;bottom:16px;display:flex;flex-direction:column;gap:9px}.mobile-bento-copy strong{font:800 clamp(.9rem,3.7vw,1.15rem)/1.13 var(--f);text-transform:uppercase}.mobile-bento-description{font:400 .78rem/1.4 var(--f);max-height:0;opacity:0;overflow:hidden;transition:max-height .3s,opacity .3s}.mobile-bento-card[aria-expanded="true"] .mobile-bento-description{max-height:130px;opacity:1}
+@media(min-width:701px) and (max-height:750px){.method-letter{font-size:min(13vw,18svh)}.method-label{font-size:16px;line-height:1.3}}
+@media(max-width:700px){.carousel-stage{height:330px}.carousel-details{padding-top:0;min-height:0}.carousel-gallery-note{font-size:.88rem;max-width:30ch;margin:0 auto 16px}.portfolio-heading{gap:16px}.portfolio-orbit{padding-top:60px;padding-bottom:44px}#carousel-root{min-height:0}#specialties-root{min-height:0;margin-top:24px}.sv{padding-bottom:36px}.method-panel h2{top:6%}.island-showcase .framer-1xghnyo{backdrop-filter:none!important}.testimonial-orbit{height:400px;margin-top:24px}.testimonial-controls{margin-top:0}}
+.circular-carousel__view{transform:scale(1.08)}
+@media(max-width:700px){.carousel-stage{height:280px}.circular-carousel__view{transform:scale(1.25)}.sol{padding-top:60px;padding-bottom:30px}}
 
-/* ===== Hero PatternWaves + botão Uiverse (vinodjangid07) adaptado à Island ===== */
-#topography-root{background:#120f17}
-.btn{--btn-bg:var(--or);--btn-bg-h:#ff8a3a;--btn-fg:#120619;position:relative;display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;min-height:48px;padding:0 26px 0 10px;border:0;border-radius:30px;background:var(--btn-bg);color:var(--btn-fg);font:700 .8rem var(--f);letter-spacing:.1em;text-transform:uppercase;text-align:left;cursor:pointer;box-shadow:5px 5px 10px rgba(0,0,0,.28);transition:background-color .5s,box-shadow .5s,transform .2s}
-.btn:not(:has(i)){padding:0 24px;justify-content:center}
-.btn i{order:-1;flex:none;width:28px;height:28px;font-size:0;line-height:0;background:currentColor;-webkit-mask:var(--compass) center/contain no-repeat;mask:var(--compass) center/contain no-repeat;transition:transform 1.5s}
-:root{--compass:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.4' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M16.6 7.4l-2.7 6.5-6.5 2.7 2.7-6.5z' fill='%23000'/%3E%3C/svg%3E")}
-.btn:hover{background:var(--btn-bg-h);transform:none;transition-duration:.5s}
-.btn:active{transform:scale(.97);transition-duration:.2s}
-.btn:hover i{transform:rotate(250deg);transition-duration:1.5s}
-.btn.p:hover{background:var(--btn-bg-h)}
-.btn:not(.p){--btn-bg:rgba(247,244,240,.08);--btn-bg-h:rgba(247,244,240,.18);--btn-fg:var(--tx);box-shadow:inset 0 0 0 1px var(--ln),5px 5px 10px rgba(0,0,0,.2);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.lab .btn{--btn-fg:var(--cy);--btn-bg-h:rgba(49,214,194,.14);box-shadow:inset 0 0 0 1px var(--cy)}
-nav .btn{min-height:42px;padding:0 20px;font-size:.72rem}
-@media(max-width:420px){.cta .btn{justify-content:center}}
-@media(hover:none){.btn:hover i{transform:none}.btn:active i{transform:rotate(250deg);transition-duration:.6s}}
-.btn.rv{transition:opacity .8s var(--d,0s),transform .8s var(--d,0s),background-color .5s,box-shadow .5s}
-.btn.rv:active{transition:transform .2s,background-color .5s,box-shadow .5s}
+/* Release the completed scroll runway; preserve accent clearance. */
+.method-section,.method-sequence{overflow-anchor:none}
+.method-sequence[data-collapsed="true"]{height:calc(100svh - 72px)}
+.method-sequence[data-collapsed="true"] .method-stage{position:relative;top:0}
+.ln{overflow:visible;padding-block:.12em;margin-block:-.06em}
+h1,h2,.hero h1{line-height:1.08}
+.testimonial-orbit{mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent)}
+@media(max-width:700px){
+html{scroll-behavior:auto}
+.testimonial-orbit{height:400px;mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent)}
+.testimonial-orbit-card .review-meta{left:14px;right:10px;bottom:12px;font-size:11px}
+.testimonial-orbit-card .review-meta svg{width:13px;height:13px}
+}

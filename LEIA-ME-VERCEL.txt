@@ -1,0 +1,16 @@
+ISLAND COMPANY — PACOTE PUBLICO PARA VERCEL
+
+Arquivos prontos: public/ e vercel.json. Sem instalação ou build.
+Publique este pacote como site estático, com diretório de saída public.
+Inclui homepage, projetos, privacidade, assets reais e animações compiladas.
+/go redireciona para landingpage.islandcompany.space.
+/jornada e Mapear minha rota apontam para https://onboarding.islandcompany.space.
+A aplicação administrativa /base e suas APIs continuam no serviço original; não são incluídas neste pacote estático.
+Não substituir a hospedagem administrativa original por este pacote sem migrar o backend.
+
+Revisão: rolagem ISLAND com espaço liberado após conclusão, blur automático no manifesto, folga para acentos, Johanes, testimonials menores no mobile, repetição e fade lateral, sem botão de pausa.
+Validado: compilação dos efeitos e TypeScript; teste de retorno da rolagem em viewport de 390px. Não representa teste de desempenho em telefone físico.
+
+
+Explorador 3D de ilhas (seção 'Diferentes especialidades / Uma direção'): public/islands/ (Three.js local, sem CDN). Seção GIMP/LAB removida da home; links do LAB continuam no menu e no rodapé. Em celular o palco 3D usa formato horizontal.
+A rota /base foi removida deste pacote estático (o redirecionamento anterior apontava para si mesmo).

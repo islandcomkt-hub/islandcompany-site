@@ -1,1 +1,0 @@
-ALTER TABLE `lead_management` ADD `recommended_islands` text;

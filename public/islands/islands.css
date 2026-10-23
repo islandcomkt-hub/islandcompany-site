@@ -99,7 +99,8 @@
  .isl-panel.has-p3{width:auto;max-height:none;padding:1.3rem 1.2rem 1.1rem}
  .isl-panel .p3-in{grid-template-columns:1fr}.isl-panel .p3-ph{min-height:0;aspect-ratio:16/11;border-radius:3px 3px 0 0}
  .isl-panel{transform:none}
- .isl-lb{padding:.38rem .6rem}.isl-lb b{font-size:.66rem;letter-spacing:.1em}.isl-lb small{display:none}
+ .isl-lb{padding:.3rem .5rem;gap:.4rem}.isl-lb b{font-size:.6rem;letter-spacing:.06em}.isl-lb small{display:none}.isl-lb i{width:6px;height:6px}
+ .isl-pre{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
  .isl-hint{font-size:.64rem;padding:.45rem .75rem;top:1.6%}
  .isl-stage{border-radius:2px}
  .isl-stage:after{box-shadow:inset 0 0 50px 14px #10051F}
@@ -110,3 +111,7 @@
 .isl-nogl .isl-fb{display:grid}
 
 @keyframes islcardm{from{opacity:0;transform:translateY(26px) scale(.97);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
+
+/* espaço entre a seção das ilhas e a seção ISLAND logo abaixo */
+.sol{padding-bottom:clamp(20px,3vw,44px)}
+@media(max-width:700px){.sol{padding-bottom:10px}}

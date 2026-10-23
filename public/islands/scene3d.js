@@ -396,7 +396,7 @@ export function createScene(canvas, data, opts) {
   let mobile = false, W = 800, H = 500, layoutIdx = null, hover = -1, focused = -1, time = 0, accentK = 0;
   const api = { THREE, islands, boatState };
   api.layout = function (mob) {
-    mobile = mob; const L = mob ? LAYOUT.mob : LAYOUT.desk;
+    mobile = mob; const L = LAYOUT.desk;
     islands.forEach((is, i) => { is.grp.position.set(L[i][0], 0, L[i][1]); uIsl[i].set(L[i][0], L[i][1], is.R, is.seed); });
   };
   /* ponto de atracação e proa de cada ilha (barco paralelo ao cais, proa para a direita da tela) */
@@ -417,9 +417,9 @@ export function createScene(canvas, data, opts) {
   api.camFor = function (i, aspect, vfrac) {
     aspect = aspect || (W / H); vfrac = vfrac || 1;
     if (i < 0) {
-      const L = mobile ? LAYOUT.mob : LAYOUT.desk, el = (mobile ? 44 : 41) * Math.PI / 180, pts = [];
+      const L = LAYOUT.desk, el = 41 * Math.PI / 180, pts = [];
       L.forEach(p => { for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; pts.push([p[0] + Math.cos(a) * 11, 0, p[1] + Math.sin(a) * 11]); } pts.push([p[0], 11, p[1]]); });
-      const st = { x: 0, y: 2, z: mobile ? 0 : 2, az: 0, el, off: 0, offy: 0 };
+      const st = { x: 0, y: 2, z: 2, az: 0, el, off: 0, offy: 0 };
       st.d = fitD(st, aspect, pts, [0.94, 0.80, 0.93]) * 1.0; return st;
     }
     const is = islands[i], c = is.grp.position, el = (mobile ? 27 : 24) * Math.PI / 180, pts = [];

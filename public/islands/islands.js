@@ -31,7 +31,7 @@
     var b = el('button', 'isl-i', world); b.type = 'button'; b.dataset.id = d.id; b.dataset.i = i;
     b.style.setProperty('--ac', d.accent);
     b.setAttribute('aria-label', d.name + ': ' + d.description + '. Abrir detalhes, ilha ' + (i + 1) + ' de ' + N);
-    var lb = el('span', 'isl-lb', b); el('i', '', lb); var nm = el('b', '', lb); nm.textContent = d.name; var sm = el('small', '', lb); sm.textContent = pad(i + 1);
+    var lb = el('span', 'isl-lb', b); el('i', '', lb); var nm = el('b', '', lb), pre = el('span', 'isl-pre', nm); pre.textContent = 'Island '; nm.appendChild(document.createTextNode(String(d.name).replace(/^Island\s+/, ''))); var sm = el('small', '', lb); sm.textContent = pad(i + 1);
     b.addEventListener('click', function () { lastTrigger = b; request(i); });
     b.addEventListener('pointerenter', function () { hoverIdx = i; if (sc) { sc.setHover(i); renderNow(); } });
     b.addEventListener('pointerleave', function () { hoverIdx = -1; if (sc) { sc.setHover(-1); renderNow(); } });
@@ -42,10 +42,10 @@
 
   /* ---------- medidas ---------- */
   function measure() {
-    mobile = MQ.matches; W = Math.round(root.clientWidth); HO = Math.round(W * (mobile ? 1.95 : 0.56)); HF = mobile ? Math.min(Math.round(W * 0.84), 440) : HO;
+    mobile = MQ.matches; W = Math.round(root.clientWidth); HO = Math.round(W * (mobile ? 0.64 : 0.56)); HF = HO;
     if (canvas) canvas.style.height = HO + 'px';
   }
-  function vfrac() { return mobile ? HF / HO : 1; }
+  function vfrac() { return 1; }
   function camOverview() { return sc.camFor(-1, W / HO); }
   /* entrada por scroll: a câmera desce sobre o arquipélago e o palco se revela conforme a seção entra na tela */
   var enterK = 1, enterDone = false;
@@ -205,7 +205,7 @@
     closePanel(); dimFor(toFocus ? target : -1); sc.setFocus(toFocus ? target : -1);
 
     var c0 = cam, c1 = toFocus ? camFocus(target) : camOverview(), ho0 = curHO, ho1 = hoFor(toFocus ? target : -1);
-    var T = RM.matches ? 0 : (travelBoat ? 2500 : (toFocus ? 1600 : 1400));
+    var T = RM.matches ? 0 : (travelBoat ? 2500 : (toFocus ? 1200 : 1050));
     var path = null, side = boatSide, nry = boatRy;
     if (travelBoat) {
       var A = sc.dock(boatAt), B = sc.dock(target); side = B.x >= A.x ? 1 : -1;
