@@ -172,28 +172,35 @@
     io.observe(ab);
   })();
 
-  /* ISLAND: cada letra abre o significado */
+  /* ISLAND: cada letra vira a própria palavra, com uma animação que mostra o que ela significa */
   (function () {
-    var btns = [].slice.call(document.querySelectorAll('.isl-l')), box = document.getElementById('isl-mean');
-    if (!btns.length || !box) return;
-    var ms = [].slice.call(box.querySelectorAll('.isl-m'));
+    var btns = [].slice.call(document.querySelectorAll('.isl-l')), stage = document.getElementById('word-stage'), word = document.querySelector('.word');
+    if (!btns.length || !stage) return;
+    var cur = -1, tmr = 0;
+    function chars(t) { return t.split('').map(function (c, i) { return '<i style="--i:' + i + '">' + (c === ' ' ? '&nbsp;' : c) + '</i>'; }).join(''); }
+    function words(t) { return t.split(' ').map(function (w, i) { return '<i style="--i:' + i + '">' + w + '</i>'; }).join(' '); }
     function pick(k) {
-      var b = btns[k], was = b.getAttribute('aria-expanded') === 'true';
-      btns.forEach(function (x) { x.setAttribute('aria-expanded', 'false'); });
-      ms.forEach(function (m) { m.hidden = true; });
-      b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
-      if (was) { box.classList.remove('open'); return; }
-      b.setAttribute('aria-expanded', 'true'); ms[k].hidden = false; box.classList.add('open');
-      var br = b.getBoundingClientRect(), xr = box.getBoundingClientRect();
-      box.style.setProperty('--nx', Math.max(16, Math.min(xr.width - 16, br.left + br.width / 2 - xr.left)) + 'px');
+      var b = btns[k], fx = b.getAttribute('data-fx');
+      if (cur === k) return;
+      cur = k;
+      btns.forEach(function (x) { x.classList.remove('on', 'go'); x.setAttribute('aria-expanded', 'false'); });
+      word.classList.add('has-on');
+      void b.offsetWidth; b.classList.add('on', 'go'); b.setAttribute('aria-expanded', 'true');
+      clearTimeout(tmr);
+      stage.className = 'word-stage fx-' + fx;
+      stage.innerHTML = (fx === 'navegacao' ? '<span class="ws-boat" aria-hidden="true">⛵</span>' : '') +
+        '<b class="ws-w">' + chars(b.getAttribute('data-w')) + '</b><p class="ws-t">' + words(b.getAttribute('data-t')) + '</p>' +
+        (fx === 'imersao' ? '<span class="ws-ripple" aria-hidden="true"></span>' : '') +
+        (fx === 'desenvolvimento' ? '<span class="ws-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' : '');
+      void stage.offsetWidth; stage.classList.add('play');
     }
-    btns.forEach(function (b, k) { b.addEventListener('click', function () { pick(k); }); b.addEventListener('animationend', function () { b.classList.remove('spin', 'hintpulse'); }); });
+    btns.forEach(function (b, k) { b.addEventListener('click', function () { pick(k); }); b.addEventListener('animationend', function (e) { if (e.target === b) b.classList.remove('go'); }); });
     if ('IntersectionObserver' in window && !RM) {
       var io = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return; io.disconnect();
-        btns.forEach(function (b, k) { setTimeout(function () { if (!b.classList.contains('spin')) b.classList.add('hintpulse'); }, 600 + k * 140); });
+        btns.forEach(function (b, k) { setTimeout(function () { if (cur < 0) { b.classList.add('hint'); setTimeout(function () { b.classList.remove('hint'); }, 900); } }, 500 + k * 130); });
       }, { threshold: 0.5 });
-      io.observe(box.previousElementSibling);
+      io.observe(word);
     }
   })();
 
