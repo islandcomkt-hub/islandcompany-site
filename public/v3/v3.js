@@ -2,6 +2,7 @@
   var ONB = 'https://onboarding.islandcompany.space';
   var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
+  if (!RM) root.classList.add('cine');
 
   /* ---------- entradas entre seções ---------- */
   if ('IntersectionObserver' in window && !RM) {
@@ -134,6 +135,19 @@
     var f = 0, x = 0, y = 0;
     h.addEventListener('pointermove', function (e) { x = e.clientX / innerWidth * 2 - 1; y = e.clientY / innerHeight * 2 - 1; if (!f) f = requestAnimationFrame(function () { f = 0; t.style.setProperty('--hx', x.toFixed(3)); t.style.setProperty('--hy', y.toFixed(3)); }); });
     h.addEventListener('pointerleave', function () { t.style.setProperty('--hx', 0); t.style.setProperty('--hy', 0); });
+  })();
+
+  /* entradas 3D extras: títulos, textos e botões que ainda não tinham entrada */
+  (function () {
+    if (RM || !('IntersectionObserver' in window)) return;
+    var sel = 'main section:not(.hero) h2, main section:not(.hero) .blk-lead, main section:not(.hero) p.l, main section:not(.hero) .btn, .portfolio-heading p, .carousel-details .btn, .word, .fd-wrap, .testimonial-disclosure, .eyebrow';
+    var els = [].slice.call(document.querySelectorAll(sel)).filter(function (e) { return !e.hasAttribute('data-up') && !e.closest('[data-up]') && !e.closest('.isl-panel') && e.getBoundingClientRect().top > innerHeight * .95; });
+    var seen = new Map();
+    els.forEach(function (e) { var p = e.parentElement, n = seen.get(p) || 0; seen.set(p, n + 1); e.style.setProperty('--dl', (n * .08) + 's'); e.classList.add('cine-x'); });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('cine-in'); io.unobserve(en.target); setTimeout(function () { en.target.classList.remove('cine-x', 'cine-in'); en.target.style.removeProperty('--dl'); }, 1600); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (e) { io.observe(e); });
+    // botões do carrossel são montados depois
+    setTimeout(function () { [].slice.call(document.querySelectorAll('.carousel-details .btn')).forEach(function (b) { if (b.getBoundingClientRect().top > innerHeight) { b.classList.add('cine-x'); io.observe(b); } }); }, 1500);
   })();
 
   /* ISLAND: cada letra abre o significado */
