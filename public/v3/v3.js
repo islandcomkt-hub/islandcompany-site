@@ -118,6 +118,15 @@
     });
   })();
 
+  /* manifesto: palavras animadas quando entram na tela */
+  (function () {
+    var m = document.querySelector('.man2'), g = m && m.querySelector('.mf-grow'); if (!m) return;
+    if (g && !g.querySelector('i')) g.innerHTML = g.textContent.split('').map(function (ch, i) { return '<i style="--i:' + i + '">' + ch + '</i>'; }).join('');
+    if (!('IntersectionObserver' in window)) { m.classList.add('mf-go'); return; }
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { m.classList.add('mf-go'); io.disconnect(); } }, { threshold: .45 });
+    io.observe(m);
+  })();
+
   /* ISLAND: cada letra abre o significado */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), box = document.getElementById('isl-mean');
@@ -256,12 +265,14 @@
       pv = document.createElement('div'); pv.className = 'phv'; pv.setAttribute('role', 'dialog'); pv.setAttribute('aria-modal', 'true'); pv.setAttribute('aria-label', 'Projeto ' + p.name);
       var inner = NOFRAME[id]
         ? '<div class="phv-shot"><img src="' + img(id, 'mobile') + '" alt="Captura do site ' + esc(p.name) + ' no celular"></div>'
-        : '<iframe src="' + esc(p.url) + '" title="Site ' + esc(p.name) + '" loading="eager" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="phv-load">Carregando</div>';
+        : '<iframe src="' + esc(p.url) + '" title="Site ' + esc(p.name) + '" loading="eager" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="phv-load">Carregando</div>';
       pv.innerHTML = '<div class="phv-bg"></div><div class="phv-wrap"><div class="phv-phone"><div class="phv-screen">' + inner + '<span class="phv-island" aria-hidden="true"></span></div>' +
         '<button type="button" class="phv-x" aria-label="Fechar visualização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
-        '<div class="phv-cap"><b>' + esc(p.name) + '</b><a href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">Abrir site ↗</a></div></div>';
+        '<div class="phv-cap"><b>' + esc(p.name) + '</b></div></div>';
       document.body.appendChild(pv); root.style.overflow = 'hidden';
-      var fr = pv.querySelector('iframe'), ld = pv.querySelector('.phv-load');
+      var fr = pv.querySelector('iframe'), ld = pv.querySelector('.phv-load'), scr = pv.querySelector('.phv-screen');
+      function fit() { if (scr) scr.style.setProperty('--k', (scr.clientWidth / 393).toFixed(4)); }
+      fit(); requestAnimationFrame(fit); addEventListener('resize', fit);
       if (fr) { fr.addEventListener('load', function () { ld.classList.add('off'); }); setTimeout(function () { ld.classList.add('off'); }, 6000); }
       pv.querySelector('.phv-bg').addEventListener('click', closePhone);
       pv.querySelector('.phv-x').addEventListener('click', closePhone);
@@ -278,6 +289,7 @@
   document.addEventListener('keydown', function (e) { if (pv && e.key === 'Escape') { e.stopImmediatePropagation(); closePhone(); } }, true);
   window.IslandPhone = { open: phone, close: closePhone };
   window.IslandPortfolio = { open: open, close: close };
+  document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.circular-carousel__card'); if (c) e.preventDefault(); }, true);
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href]');
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;

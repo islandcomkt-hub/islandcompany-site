@@ -205,7 +205,7 @@
     if (toFocus && from === -1 && mobile) { var r = root.getBoundingClientRect(); if (r.top < 70 || r.top > innerHeight * 0.35) root.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'start' }); }
     if (act) { root.tabIndex = -1; root.focus({ preventScroll: true }); }
     var swipe = 0, ghost = null;
-    root.querySelectorAll('.isl-ghost').forEach(function (g) { g.remove(); }); panel.style.visibility = '';
+    root.querySelectorAll('.isl-ghost').forEach(function (g) { g.remove(); }); panel.style.visibility = ''; panel.classList.remove('isl-swipein');
     if (toFocus && from >= 0 && from !== target && panel.dataset.open === 'true' && !RM.matches && panel.animate) {
       swipe = act === 'prev' ? -1 : act === 'next' ? 1 : (target > from ? 1 : -1);
       if ((target === 0 && from === N - 1 && act !== 'prev') || (target === N - 1 && from === 0 && act !== 'next')) swipe = act === 'prev' ? -1 : (target === 0 ? 1 : -1);
@@ -244,7 +244,7 @@
       applyCam(c1, ho1); sc.clearWake(); renderNow();
       cur = toFocus ? target : -1; dest = -2;
       if (toFocus) {
-        if (!preRendered) renderPanel(target); panel.style.visibility = ''; setState('focused'); openPanel(); setTimeout(function () { panel.classList.remove('isl-swipein'); }, 50);
+        if (!preRendered) renderPanel(target); panel.style.visibility = ''; setState('focused'); openPanel();
         if (act === 'prev' || act === 'next' || act === 'all') { var b = panel.querySelector('[data-act="' + act + '"]'); if (b) b.focus({ preventScroll: true }); }
         else if (act === 'h' || from === -1) { var h = panel.querySelector('#isl-h'); if (h) h.focus({ preventScroll: true }); }
         if (act) live.textContent = D.islands[target].name + ', ilha ' + (target + 1) + ' de ' + N;
