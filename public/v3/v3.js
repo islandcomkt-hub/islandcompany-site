@@ -127,6 +127,15 @@
     io.observe(m);
   })();
 
+  /* topo: parallax do título com o mouse (computador) */
+  (function () {
+    var h = document.querySelector('.hero'), t = document.getElementById('t1');
+    if (!h || !t || RM || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var f = 0, x = 0, y = 0;
+    h.addEventListener('pointermove', function (e) { x = e.clientX / innerWidth * 2 - 1; y = e.clientY / innerHeight * 2 - 1; if (!f) f = requestAnimationFrame(function () { f = 0; t.style.setProperty('--hx', x.toFixed(3)); t.style.setProperty('--hy', y.toFixed(3)); }); });
+    h.addEventListener('pointerleave', function () { t.style.setProperty('--hx', 0); t.style.setProperty('--hy', 0); });
+  })();
+
   /* ISLAND: cada letra abre o significado */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), box = document.getElementById('isl-mean');
