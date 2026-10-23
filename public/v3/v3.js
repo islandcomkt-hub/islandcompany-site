@@ -72,6 +72,39 @@
     }, 250);
   })();
 
+  /* painel da ilha: botão no meio das setas, "ver todas" embaixo da ilha, cards ficando para trás */
+  (function () {
+    var panel = document.getElementById('isl-panel'), allx = document.querySelector('.isl-allx');
+    if (!panel) return;
+    function fix() {
+      var nav = panel.querySelector('.isl-nav'), cta = panel.querySelector(':scope > .isl-cta'), prev = nav && nav.querySelector('[data-act=prev]');
+      if (nav && cta && prev) prev.after(cta);
+    }
+    new MutationObserver(fix).observe(panel, { childList: true });
+    fix();
+    if (allx) allx.addEventListener('click', function () { var X = window.IslandExplorer; if (X && X.all) X.all(); });
+    var cards = [].slice.call(document.querySelectorAll('.svc[data-island]')), row = document.querySelector('.svc-row');
+    var ids = window.ISLAND_DATA ? window.ISLAND_DATA.islands.map(function (d) { return d.id; }) : [], lastState = '', lastIdx = 0;
+    function cardPos(i) { var id = ids[i]; for (var k = 0; k < cards.length; k++) if (cards[k].getAttribute('data-island') === id) return k; return i * 0.6; }
+    setInterval(function () {
+      var X = window.IslandExplorer; if (!X) return;
+      var st = X.state;
+      if (allx) allx.hidden = !(st === 'focused' || st === 'travelling');
+      if ((st === 'travelling' || st === 'approaching') && lastState !== st && !RM) {
+        var from = lastIdx, to = X.dest;
+        if (to >= 0 && from >= 0 && to !== from) {
+          var dir = cardPos(to) > cardPos(from) ? 1 : -1;
+          cards.forEach(function (c, k) {
+            c.animate([{ transform: 'translateX(0) rotateY(0)' }, { transform: 'translateX(' + (-dir * 26) + 'px) rotateY(' + (dir * 9) + 'deg)', offset: .35 }, { transform: 'translateX(' + (-dir * 10) + 'px) rotateY(' + (dir * 3) + 'deg)', offset: .75 }, { transform: 'translateX(0) rotateY(0)' }], { duration: 2400, delay: k * 60, easing: 'cubic-bezier(.3,.7,.3,1)' });
+          });
+        }
+      }
+      if (st === 'focused' && X.current >= 0) lastIdx = X.current;
+      lastState = st;
+    }, 120);
+    if (row) row.style.perspective = '900px';
+  })();
+
   /* ISLAND: cada letra abre o significado */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), box = document.getElementById('isl-mean');
@@ -106,32 +139,31 @@
       var wrap = c.parentElement;
       wrap.addEventListener('pointermove', function (e) { var r = c.getBoundingClientRect(); px = Math.max(-1, Math.min(1, (e.clientX - r.left) / r.width * 2 - 1)); py = Math.max(-1, Math.min(1, (e.clientY - r.top) / r.height * 2 - 1)); c.classList.add('live'); if (!f) f = requestAnimationFrame(apply); });
       wrap.addEventListener('pointerleave', function () { px = py = 0; c.classList.remove('live'); if (!f) f = requestAnimationFrame(apply); });
-    } else {
-      addEventListener('scroll', function () { var r = c.getBoundingClientRect(), k = (r.top + r.height / 2) / innerHeight - .5; py = Math.max(-1, Math.min(1, k * 1.4)); px = Math.sin(scrollY / 260) * .5; if (!f) f = requestAnimationFrame(apply); }, { passive: true });
     }
+    addEventListener('scroll', function () { if (c.classList.contains('live')) return; var r = c.getBoundingClientRect(), k = (r.top + r.height / 2) / innerHeight - .5; py = Math.max(-1, Math.min(1, k * 1.4)); px = Math.sin(scrollY / 260) * .5; if (!f) f = requestAnimationFrame(apply); }, { passive: true });
   })();
 
   /* depoimentos: duas faixas */
   (function () {
     var box = document.getElementById('tm-rows'); if (!box) return;
     var T = [
-      ['Marina A.', 'f1', 'Landing page', 'Eu precisava explicar meu serviço sem aquele site cheio de informação solta. O resultado ficou claro e com um caminho fácil para entrar em contato.', 5],
-      ['Rafael M.', 'm1', 'Tráfego pago', 'Gostei de acompanhar o raciocínio das campanhas. As revisões e os próximos passos ficaram muito mais fáceis de entender.', 5],
-      ['Camila R.', 'f2', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. Curti demais o cuidado com as cores e o jeito de organizar cada assunto.', 5],
-      ['Lucas F.', 'm2', 'Edição de vídeo', 'O corte deu outro ritmo ao material. Legendas bem colocadas e transições na medida.', 5],
-      ['Beatriz S.', 'f3', 'Gestão de Instagram', 'Ter um calendário e uma linha de comunicação ajudou a organizar a rotina. As sugestões fizeram sentido para a marca.', 4],
-      ['Diego P.', 'm3', 'Site institucional', 'O site ficou rápido no celular e os clientes passaram a chegar já sabendo o que eu faço.', 5],
-      ['Juliana T.', 'f4', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Agora tudo conversa.', 5],
-      ['André L.', 'm4', 'Tráfego pago', 'Os relatórios são simples de ler e eu sei exatamente para onde está indo cada real.', 5],
-      ['Patrícia N.', 'f5', 'Vídeos para anúncios', 'A gravação foi leve e o resultado ficou natural. Os vídeos já estão rodando nos anúncios.', 5],
-      ['Felipe C.', 'm5', 'Estratégia', 'O diagnóstico mostrou o que fazer primeiro. Saí da reunião com um plano claro.', 5],
-      ['Larissa V.', 'f6', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram muito mais organizados.', 5],
-      ['Gustavo R.', 'm6', 'Conteúdo', 'Finalmente tenho constância nas redes sem precisar pensar em tudo sozinho.', 4]
+      ['Marina A.', 'f1', 'Landing page', 'Eu precisava explicar meu serviço sem aquele site cheio de informação solta. O resultado ficou claro e com um caminho fácil para entrar em contato', 5],
+      ['Rafael M.', 'm1', 'Tráfego pago', 'Gostei de acompanhar o raciocínio das campanhas. As revisões e os próximos passos ficaram muito mais fáceis de entender', 5],
+      ['Camila R.', 'f2', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. Curti demais o cuidado com as cores e o jeito de organizar cada assunto', 5],
+      ['Lucas F.', 'm2', 'Edição de vídeo', 'O corte deu outro ritmo ao material. Legendas bem colocadas e transições na medida', 5],
+      ['Beatriz S.', 'f3', 'Gestão de Instagram', 'Ter um calendário e uma linha de comunicação ajudou a organizar a rotina. As sugestões fizeram sentido para a marca', 4],
+      ['Diego P.', 'm3', 'Site institucional', 'O site ficou rápido no celular e os clientes passaram a chegar já sabendo o que eu faço', 5],
+      ['Juliana T.', 'f4', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Agora tudo conversa', 5],
+      ['André L.', 'm4', 'Tráfego pago', 'Os relatórios são simples de ler e eu sei exatamente para onde está indo cada real', 5],
+      ['Patrícia N.', 'f5', 'Vídeos para anúncios', 'A gravação foi leve e o resultado ficou natural. Os vídeos já estão rodando nos anúncios', 5],
+      ['Felipe C.', 'm5', 'Estratégia', 'O diagnóstico mostrou o que fazer primeiro. Saí da reunião com um plano claro', 5],
+      ['Larissa V.', 'f6', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram muito mais organizados', 5],
+      ['Gustavo R.', 'm6', 'Conteúdo', 'Finalmente tenho constância nas redes sem precisar pensar em tudo sozinho', 4]
     ];
     var P = [['#FF7417', '#B5179E'], ['#7B3FE4', '#31D6C2'], ['#FF987F', '#7B3FE4'], ['#31D6C2', '#4B1DB5'], ['#FFB347', '#FF7417'], ['#B99AF5', '#4B1DB5']];
     function card(t, i) {
       t = [t[0], t[2], t[3], t[4], t[1]];
-      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><img class="tm-av" src="/assets/faces/' + t[4] + '.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>' + t[0] + '</b><small>' + t[1] + ' · exemplo</small></span><span class="tm-st" aria-label="' + t[3] + ' de 5 estrelas">' + '★★★★★'.slice(0, t[3]) + '</span></div></article>';
+      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><img class="tm-av" src="/assets/faces/' + t[4] + '.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>' + t[0] + '</b><small>' + t[1] + '</small></span><span class="tm-st" aria-label="' + t[3] + ' de 5 estrelas">' + '★★★★★'.slice(0, t[3]) + '</span></div></article>';
     }
     function row(list, cls) { var h = list.map(card).join(''); return '<div class="tm-row ' + cls + '">' + h + h.replace(/<article class="tm">/g, '<article class="tm" aria-hidden="true">') + '</div>'; }
     box.innerHTML = row(T.slice(0, 6), 'l') + row(T.slice(6), 'r');
@@ -156,7 +188,7 @@
     ov.querySelector('.pfm-bg').addEventListener('click', close);
     ov.querySelector('.pfm-x').addEventListener('click', close);
     back.addEventListener('click', function () { grid(); });
-    ov.addEventListener('click', function (e) { var b = e.target.closest('[data-pid]'); if (b) { e.preventDefault(); detail(b.getAttribute('data-pid')); } });
+    ov.addEventListener('click', function (e) { var b = e.target.closest('[data-pid]'); if (b) { e.preventDefault(); phone(b.getAttribute('data-pid')); } });
     document.addEventListener('keydown', function (e) {
       if (!ov.classList.contains('on')) return;
       if (e.key === 'Escape') { e.preventDefault(); close(); }
@@ -184,6 +216,7 @@
     body.scrollTop = 0;
   }
   function open(id) {
+    if (id) { phone(id); return; }
     lastFocus = document.activeElement;
     load().then(function () {
       if (!ov) build();
@@ -199,6 +232,38 @@
     setTimeout(function () { if (!ov.classList.contains('on')) ov.hidden = true; }, RM ? 0 : 720);
     try { lastFocus && lastFocus.focus({ preventScroll: true }); } catch (e) {}
   }
+
+  /* ---------- projeto aberto dentro de um iPhone ---------- */
+  var NOFRAME = { letnacif: 1, marinelli: 1 }, pv = null, pvFocus = null;
+  function phone(id) {
+    load().then(function () {
+      var p = data.filter(function (x) { return x.id === id; })[0]; if (!p) return;
+      pvFocus = document.activeElement;
+      if (pv) pv.remove();
+      pv = document.createElement('div'); pv.className = 'phv'; pv.setAttribute('role', 'dialog'); pv.setAttribute('aria-modal', 'true'); pv.setAttribute('aria-label', 'Projeto ' + p.name);
+      var inner = NOFRAME[id]
+        ? '<div class="phv-shot"><img src="' + img(id, 'mobile') + '" alt="Captura do site ' + esc(p.name) + ' no celular"></div>'
+        : '<iframe src="' + esc(p.url) + '" title="Site ' + esc(p.name) + '" loading="eager" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="phv-load">Carregando</div>';
+      pv.innerHTML = '<div class="phv-bg"></div><div class="phv-wrap"><div class="phv-phone"><div class="phv-screen">' + inner + '<span class="phv-island" aria-hidden="true"></span></div>' +
+        '<button type="button" class="phv-x" aria-label="Fechar visualização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+        '<div class="phv-cap"><b>' + esc(p.name) + '</b><a href="' + esc(p.url) + '" target="_blank" rel="noopener noreferrer">Abrir site ↗</a></div></div>';
+      document.body.appendChild(pv); root.style.overflow = 'hidden';
+      var fr = pv.querySelector('iframe'), ld = pv.querySelector('.phv-load');
+      if (fr) { fr.addEventListener('load', function () { ld.classList.add('off'); }); setTimeout(function () { ld.classList.add('off'); }, 6000); }
+      pv.querySelector('.phv-bg').addEventListener('click', closePhone);
+      pv.querySelector('.phv-x').addEventListener('click', closePhone);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { pv.classList.add('on'); }); });
+      setTimeout(function () { pv && pv.querySelector('.phv-x').focus({ preventScroll: true }); }, 80);
+    });
+  }
+  function closePhone() {
+    if (!pv) return; var el = pv; pv = null; el.classList.remove('on');
+    if (!(ov && ov.classList.contains('on'))) root.style.overflow = '';
+    setTimeout(function () { el.remove(); }, RM ? 0 : 650);
+    try { pvFocus && pvFocus.focus({ preventScroll: true }); } catch (e) {}
+  }
+  document.addEventListener('keydown', function (e) { if (pv && e.key === 'Escape') { e.stopImmediatePropagation(); closePhone(); } }, true);
+  window.IslandPhone = { open: phone, close: closePhone };
   window.IslandPortfolio = { open: open, close: close };
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href]');

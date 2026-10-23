@@ -292,6 +292,7 @@
 
   /* leitura para testes e diagnóstico (somente leitura) */
   window.IslandExplorer = {
+    all: function () { request(-1); }, get dest() { return dest; },
     go: function (i) { if (typeof i === 'string') i = D.islands.findIndex(function (d) { return d.id === i; }); if (i >= 0 && i < N) request(i); },
     get state() { return state; }, get current() { return cur; }, get ready() { return loaded; }, get failed() { return failed; },
     boat: function () { return sc ? { x: sc.boatState.x, z: sc.boatState.z, ry: sc.boatState.ry } : null; },
