@@ -811,3 +811,22 @@ html.cine-go .hx-compass{animation-delay:.36s}
 .ws2 .ws-bars i{animation:none}
 .w2-fly{text-shadow:0 10px 30px rgba(18,10,34,.35)}
 .isl-l{transition:opacity .35s,color .35s,transform .4s var(--ez)}
+/* sem faixa preta entre as ilhas e o tráfego pago */
+.ads-sec.blk-white{background:var(--wh);padding-top:0;padding-bottom:clamp(50px,6vw,90px)}
+html.v3-motion .ads-sec.blk{clip-path:none!important}
+.svc-sec{padding-bottom:clamp(24px,3vw,44px)}
+/* "é aqui ó" também no celular */
+.fin-arrow small{font:inherit;font-size:.85em;opacity:.9}
+@media (max-width:820px){
+  .fin-arrow{display:grid!important;position:static;justify-items:center;transform:none;margin:0 auto 4px;order:-1}
+  .fin-arrow svg{width:70px;height:56px;transform:rotate(68deg) scaleX(-1);margin:-6px 0 -10px}
+  .fin-arrow em{margin:0;font-size:.95rem}
+  .fin2 .cta{display:flex;flex-direction:column;align-items:stretch}
+}
+@media (min-width:821px){.fin-arrow small{display:none}}
+/* abertura das seções sem a faixa escura em cima */
+body{background:#fff}
+html.v3-motion .blk:not(.blk-done){clip-path:inset(0 2.5% 0 2.5% round 40px)}
+@media (max-width:820px){html.v3-motion .blk:not(.blk-done){clip-path:inset(0 3% 0 3% round 28px)}
+  .fin-arrow svg{transform:rotate(38deg);margin:0 0 -6px}
+  .fin-arrow em{order:-1}}
