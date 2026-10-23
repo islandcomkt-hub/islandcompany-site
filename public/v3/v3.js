@@ -141,13 +141,36 @@
   (function () {
     if (RM || !('IntersectionObserver' in window)) return;
     var sel = 'main section:not(.hero) h2, main section:not(.hero) .blk-lead, main section:not(.hero) p.l, main section:not(.hero) .btn, .portfolio-heading p, .carousel-details .btn, .word, .fd-wrap, .testimonial-disclosure, .eyebrow';
-    var els = [].slice.call(document.querySelectorAll(sel)).filter(function (e) { return !e.hasAttribute('data-up') && !e.closest('[data-up]') && !e.closest('.isl-panel') && e.getBoundingClientRect().top > innerHeight * .95; });
+    var els = [].slice.call(document.querySelectorAll(sel)).filter(function (e) { return !e.matches('#sobre h2, .fd-wrap') && !e.hasAttribute('data-up') && !e.closest('[data-up]') && !e.closest('.isl-panel') && e.getBoundingClientRect().top > innerHeight * .95; });
     var seen = new Map();
     els.forEach(function (e) { var p = e.parentElement, n = seen.get(p) || 0; seen.set(p, n + 1); e.style.setProperty('--dl', (n * .08) + 's'); e.classList.add('cine-x'); });
     var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('cine-in'); io.unobserve(en.target); setTimeout(function () { en.target.classList.remove('cine-x', 'cine-in'); en.target.style.removeProperty('--dl'); }, 1600); } }); }, { rootMargin: '0px 0px -8% 0px' });
     els.forEach(function (e) { io.observe(e); });
     // botões do carrossel são montados depois
     setTimeout(function () { [].slice.call(document.querySelectorAll('.carousel-details .btn')).forEach(function (b) { if (b.getBoundingClientRect().top > innerHeight) { b.classList.add('cine-x'); io.observe(b); } }); }, 1500);
+  })();
+
+  /* mini card "+ contatos": contador ao vivo */
+  (function () {
+    var n = document.querySelector('.ads-n'), k = document.querySelector('.ads-kpi'); if (!n) return;
+    var to = +n.getAttribute('data-to') || 48, cur = 0;
+    function run() {
+      if (RM) { n.textContent = to; cur = to; return; }
+      var t0 = performance.now();
+      (function step(t) { var p = Math.min(1, (t - t0) / 1600), e = 1 - Math.pow(1 - p, 3); n.textContent = Math.round(to * e); if (p < 1) requestAnimationFrame(step); else { cur = to; live(); } })(t0);
+    }
+    function live() { setInterval(function () { if (document.hidden) return; cur += 1 + Math.round(Math.random()); n.textContent = cur; k.classList.remove('bump'); void k.offsetWidth; k.classList.add('bump'); }, 3800); }
+    if (!('IntersectionObserver' in window)) return run();
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); run(); } }, { threshold: .4 });
+    io.observe(n);
+  })();
+
+  /* biografia: entrada do card e do título */
+  (function () {
+    var ab = document.querySelector('.ab'); if (!ab) return;
+    if (RM || !('IntersectionObserver' in window)) { ab.classList.add('bio-in'); return; }
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { ab.classList.add('bio-in'); io.disconnect(); } }, { threshold: .25 });
+    io.observe(ab);
   })();
 
   /* ISLAND: cada letra abre o significado */
