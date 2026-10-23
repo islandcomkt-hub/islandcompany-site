@@ -172,84 +172,96 @@
     io.observe(ab);
   })();
 
-  /* ISLAND: a própria letra desce e se transforma na palavra */
+  /* ISLAND: a letra de cima desce e vira a palavra (sem repetir); ao trocar, a anterior volta para o lugar */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), stage = document.getElementById('word-stage'), word = document.querySelector('.word');
     if (!btns.length || !stage) return;
-    var cur = -1, busy = null, EZ = 'cubic-bezier(.65,0,.35,1)', OUT = 'cubic-bezier(.16,1,.3,1)';
-    // trajetória da letra até a palavra, com o "jeito" de cada significado
-    function flight(fx, dx, dy, s) {
-      var end = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
-      var mid = function (x, y, extra) { return 'translate(' + (dx * x) + 'px,' + (dy * y) + 'px) scale(' + (1 + (s - 1) * x) + ') ' + (extra || ''); };
-      switch (fx) {
-        case 'imersao': return [{ transform: 'none' }, { transform: mid(.25, .55, 'scaleY(.9)'), opacity: .55, offset: .4 }, { transform: mid(.75, 1.08), opacity: 1, offset: .75 }, { transform: end }];
-        case 'segmentacao': return [{ transform: 'none' }, { transform: mid(.35, .35, 'skewX(-14deg)'), offset: .35 }, { transform: mid(.7, .75, 'skewX(10deg)'), offset: .65 }, { transform: end }];
-        case 'lapidacao': return [{ transform: 'none' }, { transform: mid(.4, .4, 'rotate(-12deg)'), offset: .4 }, { transform: mid(.8, .85, 'rotate(6deg)'), offset: .75 }, { transform: end }];
-        case 'ativacao': return [{ transform: 'none', opacity: 1 }, { opacity: .25, offset: .2 }, { opacity: 1, offset: .3 }, { opacity: .35, offset: .42 }, { transform: mid(.6, .6), opacity: 1, offset: .55 }, { transform: end, opacity: 1 }];
-        case 'navegacao': return [{ transform: 'none' }, { transform: mid(.25, .3, 'rotate(8deg)'), offset: .25 }, { transform: mid(.5, .55, 'rotate(-7deg)'), offset: .5 }, { transform: mid(.75, .8, 'rotate(5deg)'), offset: .75 }, { transform: end }];
-        default: return [{ transform: 'none' }, { transform: mid(.5, .5, 'scaleY(1.15)'), offset: .5 }, { transform: end }];
+    var cur = -1, busy = false, EZ = 'cubic-bezier(.65,0,.35,1)', OUT = 'cubic-bezier(.16,1,.3,1)';
+    function T(dx, dy, s, extra) { return 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ') ' + (extra || ''); }
+    function clone(b, r, clip) {
+      var cs = getComputedStyle(b), c = document.createElement('span');
+      c.className = 'w2-fly'; c.textContent = b.textContent;
+      c.style.cssText = 'position:fixed;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;font:' + cs.font + ';line-height:' + cs.lineHeight + ';color:#FF7417;display:grid;place-items:center;z-index:60;transform-origin:50% 50%;will-change:transform,opacity;pointer-events:none;' + (clip ? 'clip-path:' + clip + ';' : '');
+      document.body.appendChild(c); return c;
+    }
+    function done(a) { return new Promise(function (r) { a.onfinish = r; a.oncancel = r; }); }
+    // voo da letra: cada significado tem o seu
+    function fly(b, fx, sr, tr, back) {
+      var s = tr.height / sr.height, dx = (tr.left + tr.width / 2) - (sr.left + sr.width / 2), dy = (tr.top + tr.height / 2) - (sr.top + sr.height / 2);
+      var P = function (k, extra, kk) { var q = kk == null ? k : kk; return T(dx * k, dy * q, 1 + (s - 1) * k, extra); };
+      var kf, opt = { duration: 900, easing: EZ, fill: 'forwards' }, list = [];
+      if (back) { var c0 = clone(b, sr); var a0 = c0.animate([{ transform: 'none', opacity: 1 }, { transform: P(1), opacity: 1 }], { duration: 520, easing: EZ, fill: 'forwards' }); return done(a0).then(function () { c0.remove(); }); }
+      if (fx === 'segmentacao') {
+        var cuts = ['inset(0 0 66% 0)', 'inset(33% 0 33% 0)', 'inset(66% 0 0 0)'], offs = [-60, 50, -40];
+        cuts.forEach(function (cl, i) {
+          var c = clone(b, sr, cl);
+          list.push(done(c.animate([{ transform: 'none' }, { transform: P(.45, 'translateX(' + offs[i] + 'px) rotate(' + (offs[i] / 6) + 'deg)'), offset: .5 }, { transform: P(1) }], { duration: 900, delay: i * 70, easing: EZ, fill: 'forwards' })).then(function () { c.remove(); }));
+        });
+        return Promise.all(list);
       }
+      var c = clone(b, sr);
+      switch (fx) {
+        case 'imersao': kf = [{ transform: 'none', opacity: 1 }, { transform: P(.15, 'scaleY(.85)', .45), opacity: .9, offset: .25 }, { transform: P(.5, '', 1.25), opacity: .15, offset: .55 }, { transform: P(.85, '', 1.05), opacity: .9, offset: .8 }, { transform: P(1), opacity: 1 }]; opt.duration = 1000; break;
+        case 'lapidacao': kf = [{ transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' }, { transform: P(.3, 'rotateY(180deg)'), clipPath: 'polygon(20% 0,100% 15%,85% 100%,0 80%)', offset: .3 }, { transform: P(.6, 'rotateY(300deg)'), clipPath: 'polygon(10% 10%,90% 0,100% 90%,15% 100%)', offset: .6 }, { transform: P(1, 'rotateY(360deg)'), clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' }]; opt.duration = 1000; break;
+        case 'ativacao': kf = [{ transform: 'none', opacity: 1, textShadow: 'none' }, { opacity: .15, offset: .1 }, { opacity: 1, textShadow: '0 0 30px #FFB36B', offset: .18 }, { opacity: .2, offset: .26 }, { opacity: 1, textShadow: '0 0 40px #FF9A45', transform: 'scale(1.12)', offset: .4 }, { transform: P(1), opacity: 1, textShadow: '0 0 24px rgba(255,140,60,.8)' }]; opt.duration = 950; break;
+        case 'navegacao': kf = [{ transform: 'none' }, { transform: P(.2, 'rotate(10deg)', .1), offset: .2 }, { transform: P(.4, 'rotate(-9deg)', .45), offset: .4 }, { transform: P(.6, 'rotate(8deg)', .55), offset: .6 }, { transform: P(.8, 'rotate(-6deg)', .9), offset: .8 }, { transform: P(1) }]; opt.duration = 1100; opt.easing = 'cubic-bezier(.45,0,.55,1)'; break;
+        default: kf = [{ transform: 'none' }, { transform: P(.5, 'scale(.35)'), offset: .35 }, { transform: P(.75, 'scale(.7)'), offset: .55 }, { transform: P(.9, 'scale(1.1)'), offset: .78 }, { transform: P(1) }]; opt.duration = 1000; opt.easing = 'cubic-bezier(.4,0,.2,1)';
+      }
+      return done(c.animate(kf, opt)).then(function () { c.remove(); });
     }
     function charIn(fx, i, off) {
-      var from;
       switch (fx) {
-        case 'imersao': from = 'translate(' + (-off) + 'px,40%)'; break;
-        case 'segmentacao': from = 'translate(' + (-off) + 'px,' + (i % 2 ? 35 : -35) + '%)'; break;
-        case 'lapidacao': from = 'translate(' + (-off) + 'px,0) scale(1.35) rotate(' + (i % 2 ? 10 : -10) + 'deg)'; break;
-        case 'navegacao': from = 'translate(' + (-off) + 'px,' + (Math.sin(i) * 25) + '%)'; break;
-        case 'desenvolvimento': from = 'translate(' + (-off) + 'px,0) scaleY(.15)'; break;
-        default: from = 'translate(' + (-off) + 'px,0)';
+        case 'imersao': return [{ transform: 'translate(' + (-off) + 'px,55%)', opacity: 0 }, { transform: 'translate(0,-8%)', opacity: 1, offset: .7 }, { transform: 'none', opacity: 1 }];
+        case 'segmentacao': return [{ transform: 'translate(' + (-off) + 'px,' + (i % 3 - 1) * 60 + '%)', opacity: 0 }, { transform: 'none', opacity: 1 }];
+        case 'lapidacao': return [{ transform: 'translate(' + (-off) + 'px,0) rotateY(90deg) scale(1.3)', opacity: 0 }, { transform: 'none', opacity: 1 }];
+        case 'ativacao': return [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .1, offset: .35 }, { opacity: 1, offset: .5 }, { opacity: .3, offset: .62 }, { opacity: 1 }];
+        case 'navegacao': return [{ transform: 'translate(' + (-off) + 'px,' + (Math.sin(i * 1.3) * 30) + '%) rotate(' + (i % 2 ? 8 : -8) + 'deg)', opacity: 0 }, { transform: 'none', opacity: 1 }];
+        default: return [{ transform: 'translate(' + (-off) + 'px,0) scaleY(0)', opacity: 0, transformOrigin: '50% 100%' }, { transform: 'scaleY(1.15)', opacity: 1, offset: .7, transformOrigin: '50% 100%' }, { transform: 'none', opacity: 1, transformOrigin: '50% 100%' }];
       }
-      return [{ transform: from, opacity: 0 }, { transform: 'none', opacity: 1 }];
     }
-    function clearStage() {
-      return new Promise(function (res) {
-        var kids = [].slice.call(stage.children);
-        if (!kids.length || RM) { stage.innerHTML = ''; return res(); }
-        var a = stage.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(10px)' }], { duration: 220, easing: 'ease-in' });
-        a.onfinish = function () { stage.innerHTML = ''; res(); };
-      });
+    function collapse() {
+      if (cur < 0) return Promise.resolve();
+      var ob = btns[cur], chars = [].slice.call(stage.querySelectorAll('.ws2-w i')), rest = [].slice.call(stage.querySelectorAll('.ws2-t, .ws-bars'));
+      if (!chars.length) { ob.classList.remove('away', 'on'); return Promise.resolve(); }
+      var x0 = chars[0].getBoundingClientRect().left, ps = [];
+      rest.forEach(function (e) { ps.push(done(e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }))); });
+      chars.slice(1).forEach(function (c, i, arr) { var off = c.getBoundingClientRect().left - x0; ps.push(done(c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + (-off) + 'px)', opacity: 0 }], { duration: 320, delay: (arr.length - i) * 15, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' }))); });
+      return Promise.all(ps).then(function () {
+        var fr = chars[0].getBoundingClientRect(); chars[0].style.opacity = 0;
+        var tr = ob.getBoundingClientRect();
+        return fly(ob, '', fr, tr, true);
+      }).then(function () { ob.classList.remove('away', 'on'); stage.innerHTML = ''; });
     }
     function pick(k) {
       if (cur === k || busy) return;
+      busy = true;
       var b = btns[k], fx = b.getAttribute('data-fx'), w = b.getAttribute('data-w'), t = b.getAttribute('data-t');
-      cur = k;
-      btns.forEach(function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-expanded', x === b ? 'true' : 'false'); });
-      word.classList.add('has-on');
-      busy = clearStage().then(function () {
+      collapse().then(function () {
+        cur = k; word.classList.add('has-on');
+        btns.forEach(function (x) { x.setAttribute('aria-expanded', x === b ? 'true' : 'false'); });
         stage.className = 'word-stage ws2 fx-' + fx;
-        stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c, i) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' +
+        stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' +
           (fx === 'desenvolvimento' ? '<span class="ws-bars"><i></i><i></i><i></i><i></i><i></i></span>' : '');
         var chars = [].slice.call(stage.querySelectorAll('.ws2-w i')), ws = [].slice.call(stage.querySelectorAll('.ws2-t i')), bars = [].slice.call(stage.querySelectorAll('.ws-bars i'));
+        b.classList.add('on', 'away');
+        if (RM) { return; }
         chars.concat(ws, bars).forEach(function (e) { e.style.opacity = 0; });
-        if (RM) { chars.concat(ws, bars).forEach(function (e) { e.style.opacity = 1; }); busy = null; return; }
         var sr = b.getBoundingClientRect(), tr = chars[0].getBoundingClientRect();
-        var cl = document.createElement('span'); cl.className = 'w2-fly'; cl.textContent = b.textContent;
-        var cs = getComputedStyle(b);
-        cl.style.cssText = 'position:fixed;left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px;font:' + cs.font + ';color:' + cs.color + ';line-height:' + cs.lineHeight + ';display:grid;place-items:center;margin:0;z-index:60;transform-origin:50% 50%;will-change:transform;pointer-events:none';
-        document.body.appendChild(cl);
-        b.style.opacity = '.18';
-        var s = tr.height / sr.height, dx = (tr.left + tr.width / 2) - (sr.left + sr.width / 2), dy = (tr.top + tr.height / 2) - (sr.top + sr.height / 2);
-        var fl = cl.animate(flight(fx, dx, dy, s), { duration: 820, easing: EZ, fill: 'forwards' });
-        cl.animate([{ color: cs.color }, { color: getComputedStyle(chars[0]).color }], { duration: 820, fill: 'forwards' });
-        return new Promise(function (res) {
-          fl.onfinish = function () {
-            chars[0].style.opacity = 1; cl.remove(); b.style.opacity = '';
-            var x0 = chars[0].getBoundingClientRect().left;
-            chars.slice(1).forEach(function (c, i) {
-              var off = c.getBoundingClientRect().left - x0;
-              var a = c.animate(charIn(fx, i, off), { duration: fx === 'ativacao' ? 380 : 620, delay: i * (fx === 'navegacao' ? 55 : 35), easing: OUT, fill: 'forwards' });
-              a.onfinish = function () { c.style.opacity = 1; a.cancel(); };
-            });
-            var base = 260 + chars.length * 35;
-            ws.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 45, easing: OUT, fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
-            bars.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'scaleY(0)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 90, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
-            res();
-          };
+        return fly(b, fx, sr, tr).then(function () {
+          chars[0].style.opacity = 1;
+          var x0 = chars[0].getBoundingClientRect().left;
+          chars.slice(1).forEach(function (c, i) {
+            var off = c.getBoundingClientRect().left - x0;
+            var a = c.animate(charIn(fx, i, off), { duration: fx === 'ativacao' ? 420 : 640, delay: i * (fx === 'navegacao' ? 60 : fx === 'desenvolvimento' ? 55 : 35), easing: fx === 'ativacao' ? 'linear' : OUT, fill: 'forwards' });
+            a.onfinish = function () { c.style.opacity = 1; a.cancel(); };
+          });
+          var base = 280 + chars.length * 40;
+          ws.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 45, easing: OUT, fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
+          bars.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'scaleY(0)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 90, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
         });
-      }).then(function () { busy = null; }, function () { busy = null; });
+      }).then(function () { busy = false; }, function () { busy = false; });
     }
-    btns.forEach(function (b, k) { b.addEventListener('click', function () { pick(k); }); });
+    btns.forEach(function (b, k) { b.addEventListener('click', function () { if (cur === k && !busy) { busy = true; collapse().then(function () { cur = -1; word.classList.remove('has-on'); stage.innerHTML = '<p class="ws-hint">Toque em uma letra para descobrir o significado</p>'; busy = false; }); return; } pick(k); }); });
     if ('IntersectionObserver' in window && !RM) {
       var io = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return; io.disconnect();
