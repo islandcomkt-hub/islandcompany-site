@@ -804,3 +804,10 @@ html.cine-wait .hx-s,html.cine-wait .hx-b,html.cine-wait .hero p.l,html.cine-wai
 html.cine-go .hx-sail,html.cine-go .hx-compass{animation-name:cFlip;animation-duration:.95s;animation-delay:.12s;animation-fill-mode:both}
 html.cine-go .hx-compass{animation-delay:.36s}
 .hx-s,.hx-b,.hero p.l,.hero .cta .btn{backface-visibility:hidden;will-change:transform,opacity}
+/* ISLAND v2: a letra desce e vira a palavra (mesma fonte, transição contínua) */
+.ws2 .ws2-w{display:inline-flex;font:900 clamp(2.4rem,6.4vw,4.8rem)/1 var(--f);text-transform:uppercase;letter-spacing:-.01em;color:var(--or)}
+.ws2 .ws2-w i,.ws2 .ws2-t i,.ws2 .ws-bars i{font-style:normal;display:inline-block;will-change:transform,opacity}
+.ws2 .ws2-t{font-size:clamp(1.02rem,1.6vw,1.3rem);color:rgba(255,255,255,.92);max-width:34ch;line-height:1.4}
+.ws2 .ws-bars i{animation:none}
+.w2-fly{text-shadow:0 10px 30px rgba(18,10,34,.35)}
+.isl-l{transition:opacity .35s,color .35s,transform .4s var(--ez)}

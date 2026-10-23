@@ -172,29 +172,84 @@
     io.observe(ab);
   })();
 
-  /* ISLAND: cada letra vira a própria palavra, com uma animação que mostra o que ela significa */
+  /* ISLAND: a própria letra desce e se transforma na palavra */
   (function () {
     var btns = [].slice.call(document.querySelectorAll('.isl-l')), stage = document.getElementById('word-stage'), word = document.querySelector('.word');
     if (!btns.length || !stage) return;
-    var cur = -1, tmr = 0;
-    function chars(t) { return t.split('').map(function (c, i) { return '<i style="--i:' + i + '">' + (c === ' ' ? '&nbsp;' : c) + '</i>'; }).join(''); }
-    function words(t) { return t.split(' ').map(function (w, i) { return '<i style="--i:' + i + '">' + w + '</i>'; }).join(' '); }
-    function pick(k) {
-      var b = btns[k], fx = b.getAttribute('data-fx');
-      if (cur === k) return;
-      cur = k;
-      btns.forEach(function (x) { x.classList.remove('on', 'go'); x.setAttribute('aria-expanded', 'false'); });
-      word.classList.add('has-on');
-      void b.offsetWidth; b.classList.add('on', 'go'); b.setAttribute('aria-expanded', 'true');
-      clearTimeout(tmr);
-      stage.className = 'word-stage fx-' + fx;
-      stage.innerHTML = (fx === 'navegacao' ? '<span class="ws-boat" aria-hidden="true">⛵</span>' : '') +
-        '<b class="ws-w">' + chars(b.getAttribute('data-w')) + '</b><p class="ws-t">' + words(b.getAttribute('data-t')) + '</p>' +
-        (fx === 'imersao' ? '<span class="ws-ripple" aria-hidden="true"></span>' : '') +
-        (fx === 'desenvolvimento' ? '<span class="ws-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' : '');
-      void stage.offsetWidth; stage.classList.add('play');
+    var cur = -1, busy = null, EZ = 'cubic-bezier(.65,0,.35,1)', OUT = 'cubic-bezier(.16,1,.3,1)';
+    // trajetória da letra até a palavra, com o "jeito" de cada significado
+    function flight(fx, dx, dy, s) {
+      var end = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
+      var mid = function (x, y, extra) { return 'translate(' + (dx * x) + 'px,' + (dy * y) + 'px) scale(' + (1 + (s - 1) * x) + ') ' + (extra || ''); };
+      switch (fx) {
+        case 'imersao': return [{ transform: 'none' }, { transform: mid(.25, .55, 'scaleY(.9)'), opacity: .55, offset: .4 }, { transform: mid(.75, 1.08), opacity: 1, offset: .75 }, { transform: end }];
+        case 'segmentacao': return [{ transform: 'none' }, { transform: mid(.35, .35, 'skewX(-14deg)'), offset: .35 }, { transform: mid(.7, .75, 'skewX(10deg)'), offset: .65 }, { transform: end }];
+        case 'lapidacao': return [{ transform: 'none' }, { transform: mid(.4, .4, 'rotate(-12deg)'), offset: .4 }, { transform: mid(.8, .85, 'rotate(6deg)'), offset: .75 }, { transform: end }];
+        case 'ativacao': return [{ transform: 'none', opacity: 1 }, { opacity: .25, offset: .2 }, { opacity: 1, offset: .3 }, { opacity: .35, offset: .42 }, { transform: mid(.6, .6), opacity: 1, offset: .55 }, { transform: end, opacity: 1 }];
+        case 'navegacao': return [{ transform: 'none' }, { transform: mid(.25, .3, 'rotate(8deg)'), offset: .25 }, { transform: mid(.5, .55, 'rotate(-7deg)'), offset: .5 }, { transform: mid(.75, .8, 'rotate(5deg)'), offset: .75 }, { transform: end }];
+        default: return [{ transform: 'none' }, { transform: mid(.5, .5, 'scaleY(1.15)'), offset: .5 }, { transform: end }];
+      }
     }
-    btns.forEach(function (b, k) { b.addEventListener('click', function () { pick(k); }); b.addEventListener('animationend', function (e) { if (e.target === b) b.classList.remove('go'); }); });
+    function charIn(fx, i, off) {
+      var from;
+      switch (fx) {
+        case 'imersao': from = 'translate(' + (-off) + 'px,40%)'; break;
+        case 'segmentacao': from = 'translate(' + (-off) + 'px,' + (i % 2 ? 35 : -35) + '%)'; break;
+        case 'lapidacao': from = 'translate(' + (-off) + 'px,0) scale(1.35) rotate(' + (i % 2 ? 10 : -10) + 'deg)'; break;
+        case 'navegacao': from = 'translate(' + (-off) + 'px,' + (Math.sin(i) * 25) + '%)'; break;
+        case 'desenvolvimento': from = 'translate(' + (-off) + 'px,0) scaleY(.15)'; break;
+        default: from = 'translate(' + (-off) + 'px,0)';
+      }
+      return [{ transform: from, opacity: 0 }, { transform: 'none', opacity: 1 }];
+    }
+    function clearStage() {
+      return new Promise(function (res) {
+        var kids = [].slice.call(stage.children);
+        if (!kids.length || RM) { stage.innerHTML = ''; return res(); }
+        var a = stage.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(10px)' }], { duration: 220, easing: 'ease-in' });
+        a.onfinish = function () { stage.innerHTML = ''; res(); };
+      });
+    }
+    function pick(k) {
+      if (cur === k || busy) return;
+      var b = btns[k], fx = b.getAttribute('data-fx'), w = b.getAttribute('data-w'), t = b.getAttribute('data-t');
+      cur = k;
+      btns.forEach(function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-expanded', x === b ? 'true' : 'false'); });
+      word.classList.add('has-on');
+      busy = clearStage().then(function () {
+        stage.className = 'word-stage ws2 fx-' + fx;
+        stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c, i) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' +
+          (fx === 'desenvolvimento' ? '<span class="ws-bars"><i></i><i></i><i></i><i></i><i></i></span>' : '');
+        var chars = [].slice.call(stage.querySelectorAll('.ws2-w i')), ws = [].slice.call(stage.querySelectorAll('.ws2-t i')), bars = [].slice.call(stage.querySelectorAll('.ws-bars i'));
+        chars.concat(ws, bars).forEach(function (e) { e.style.opacity = 0; });
+        if (RM) { chars.concat(ws, bars).forEach(function (e) { e.style.opacity = 1; }); busy = null; return; }
+        var sr = b.getBoundingClientRect(), tr = chars[0].getBoundingClientRect();
+        var cl = document.createElement('span'); cl.className = 'w2-fly'; cl.textContent = b.textContent;
+        var cs = getComputedStyle(b);
+        cl.style.cssText = 'position:fixed;left:' + sr.left + 'px;top:' + sr.top + 'px;width:' + sr.width + 'px;height:' + sr.height + 'px;font:' + cs.font + ';color:' + cs.color + ';line-height:' + cs.lineHeight + ';display:grid;place-items:center;margin:0;z-index:60;transform-origin:50% 50%;will-change:transform;pointer-events:none';
+        document.body.appendChild(cl);
+        b.style.opacity = '.18';
+        var s = tr.height / sr.height, dx = (tr.left + tr.width / 2) - (sr.left + sr.width / 2), dy = (tr.top + tr.height / 2) - (sr.top + sr.height / 2);
+        var fl = cl.animate(flight(fx, dx, dy, s), { duration: 820, easing: EZ, fill: 'forwards' });
+        cl.animate([{ color: cs.color }, { color: getComputedStyle(chars[0]).color }], { duration: 820, fill: 'forwards' });
+        return new Promise(function (res) {
+          fl.onfinish = function () {
+            chars[0].style.opacity = 1; cl.remove(); b.style.opacity = '';
+            var x0 = chars[0].getBoundingClientRect().left;
+            chars.slice(1).forEach(function (c, i) {
+              var off = c.getBoundingClientRect().left - x0;
+              var a = c.animate(charIn(fx, i, off), { duration: fx === 'ativacao' ? 380 : 620, delay: i * (fx === 'navegacao' ? 55 : 35), easing: OUT, fill: 'forwards' });
+              a.onfinish = function () { c.style.opacity = 1; a.cancel(); };
+            });
+            var base = 260 + chars.length * 35;
+            ws.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 45, easing: OUT, fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
+            bars.forEach(function (e, i) { var a = e.animate([{ opacity: 0, transform: 'scaleY(0)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: base + i * 90, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'forwards' }); a.onfinish = function () { e.style.opacity = 1; a.cancel(); }; });
+            res();
+          };
+        });
+      }).then(function () { busy = null; }, function () { busy = null; });
+    }
+    btns.forEach(function (b, k) { b.addEventListener('click', function () { pick(k); }); });
     if ('IntersectionObserver' in window && !RM) {
       var io = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return; io.disconnect();
