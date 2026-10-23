@@ -181,7 +181,7 @@
     function clone(b, r, clip) {
       var cs = getComputedStyle(b), c = document.createElement('span');
       c.className = 'w2-fly'; c.textContent = b.textContent;
-      c.style.cssText = 'position:fixed;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;font:' + cs.font + ';line-height:' + cs.lineHeight + ';color:#FF7417;display:grid;place-items:center;z-index:60;transform-origin:50% 50%;will-change:transform,opacity;pointer-events:none;' + (clip ? 'clip-path:' + clip + ';' : '');
+      c.style.cssText = 'position:fixed;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;font:' + cs.font + ';line-height:' + cs.lineHeight + ';color:#00C85A;display:grid;place-items:center;z-index:60;transform-origin:50% 50%;will-change:transform,opacity;pointer-events:none;' + (clip ? 'clip-path:' + clip + ';' : '');
       document.body.appendChild(c); return c;
     }
     function done(a) { return new Promise(function (r) { a.onfinish = r; a.oncancel = r; }); }
@@ -242,6 +242,8 @@
         stage.className = 'word-stage ws2 fx-' + fx;
         stage.innerHTML = '<b class="ws2-w">' + w.split('').map(function (c) { return '<i>' + c + '</i>'; }).join('') + '</b><p class="ws2-t">' + t.split(' ').map(function (x) { return '<i>' + x + '</i>'; }).join(' ') + '</p>' +
           (fx === 'desenvolvimento' ? '<span class="ws-bars"><i></i><i></i><i></i><i></i><i></i></span>' : '');
+        var wEl = stage.querySelector('.ws2-w'), avail = stage.clientWidth * .96;
+        if (wEl.scrollWidth > avail) wEl.style.fontSize = (parseFloat(getComputedStyle(wEl).fontSize) * avail / wEl.scrollWidth).toFixed(1) + 'px';
         var chars = [].slice.call(stage.querySelectorAll('.ws2-w i')), ws = [].slice.call(stage.querySelectorAll('.ws2-t i')), bars = [].slice.call(stage.querySelectorAll('.ws-bars i'));
         b.classList.add('on', 'away');
         if (RM) { return; }
