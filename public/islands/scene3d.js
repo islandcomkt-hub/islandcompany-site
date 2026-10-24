@@ -643,7 +643,7 @@ export function createScene(canvas, data, opts) {
   let kSpot = -1, kCycle = -1, kN = 5;
   // sombra de um monstro gigante passando por baixo d'água
   const mon = new THREE.TextureLoader().load('/assets/monster-shadow.webp'); mon.colorSpace = THREE.NoColorSpace; mon.repeat.set(1 / 8, 1 / 6); mon.generateMipmaps = true;
-  const monster = new THREE.Mesh(new THREE.PlaneGeometry(22.5, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#02040c', alphaMap: mon, transparent: true, opacity: 0.2, depthWrite: false, fog: false }));
+  const monster = new THREE.Mesh(new THREE.PlaneGeometry(36, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#02040c', alphaMap: mon, transparent: true, opacity: 0.13, depthWrite: false, fog: false }));
   monster.position.y = 0.045; monster.renderOrder = 1; scene.add(monster);
 
   api.render = function (ms) {
@@ -675,7 +675,7 @@ export function createScene(canvas, data, opts) {
       const W = krWater.material.uniforms; W.uT.value = t; W.uA.value = act * act * (3 - 2 * act); W.uB.value = lt > KLEAD && lt < KLEAD + 2.2 ? (lt - KLEAD) / 2.2 : 0; krWater.visible = act > 0;
       tent.forEach((T, k) => { T.u.value = t; if (!T.on) { T.g.visible = false; return; } const tt = lt - T.delay; const up = tt < 0 ? 0 : tt < 2.6 ? tt / 2.6 : tt < 10.5 ? 1 : tt < 13.1 ? 1 - (tt - 10.5) / 2.6 : 0, e = up * up * (3 - 2 * up);
         T.mesh.position.y = -T.H * T.mesh.scale.y * (1 - e) * 1.05 - 0.2; T.g.visible = up > 0; T.ring.scale.setScalar(0.5 + e * 0.9 + Math.sin(t * 2 + k) * 0.05); T.ring.material.opacity = 0.16 + 0.34 * Math.sin(Math.PI * Math.min(1, up)) ; }); }
-    { const L = 280, s2 = (((t + 40) * 2.6) % L) - L / 2, dz = Math.cos(t * 0.07) * 0.07 * 5 / 2.6; monster.position.x = s2; monster.position.z = 1 + Math.sin(t * 0.07) * 5; monster.rotation.y = Math.atan2(-1, -dz);
+    { const L = 320, s2 = (((t + 40) * 2.6) % L) - L / 2, dz = Math.cos(t * 0.07) * 0.07 * 5 / 2.6; monster.position.x = s2; monster.position.z = 1 + Math.sin(t * 0.07) * 5; monster.rotation.y = Math.atan2(-1, -dz);
       const fr = Math.floor(t * 8.3) % 48; mon.offset.set((fr % 8) / 8, 1 - (Math.floor(fr / 8) + 1) / 6); } waterMat.uniforms.uMoon.value.copy(moon.position).normalize();
     _md.copy(moon.position).normalize();
     shafts.forEach((m, i) => { const c = islands[i].grp.position; m.quaternion.setFromUnitVectors(_up, _md); m.position.set(c.x, P + 0.2, c.z).addScaledVector(_md, 46); const u = m.material.uniforms; u.uTime.value = t; u.uK.value = uBoost[i]; u.uC.value.copy(m.userData.c).lerp(accents[i], uBoost[i] * 0.6); });
