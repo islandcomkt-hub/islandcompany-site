@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta property="og:title" content="Briefing Island"><meta property="og:description" content="As 5 perguntas + 10 pedidos prontos pra IA">
+<title>Briefing Island</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Yeseva+One&family=Caveat:wght@700&display=swap">
+<style>
+/* Layout: uma coluna estreita, ritmo de carrossel — blocos com tira de papel rasgado e cards de copiar */
+:root{
+  --bg:#FAFAF6; --fg:#141414; --muted:#5d5a63; --card:#ffffff; --line:#e6e2d8;
+  --purple:#6703D5; --orange:#FE7002; --teal:#03C99A; --tealbg:#C9F7EA; --yellow:#FFE62E; --ink:#141414;
+  --display:'Yeseva One', Georgia, serif; --sans:'Poppins', system-ui, sans-serif; --hand:'Caveat', 'Comic Sans MS', cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#120A1F; --fg:#F4F1FA; --muted:#b9b1c9; --card:#1D1430; --line:#33284a; --tealbg:#0d3b33; --ink:#141414; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#120A1F; --fg:#F4F1FA; --muted:#b9b1c9; --card:#1D1430; --line:#33284a; --tealbg:#0d3b33; --ink:#141414; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;padding-block:28px 64px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{background:var(--purple);border-radius:40px;padding:8px 16px;display:inline-flex}
+.logo img{height:26px;display:block}
+.ig{font-weight:600;font-size:14px;color:var(--muted)}
+.hero{position:relative;margin-top:28px}
+.tag{display:inline-block;background:var(--teal);color:var(--ink);font-weight:800;font-size:13px;letter-spacing:1.5px;padding:6px 14px;transform:rotate(-2deg)}
+h1{font-weight:900;text-transform:uppercase;letter-spacing:-1.5px;line-height:.95;font-size:clamp(40px,9vw,72px);margin:18px 0 0;text-wrap:balance}
+.strip{display:inline-block;background:var(--orange);color:var(--purple);font-family:var(--display);font-size:clamp(44px,10vw,84px);line-height:1;padding:4px 18px 12px;transform:rotate(-2deg);margin-top:6px;
+  clip-path:polygon(0 4%,8% 0,22% 3%,40% 0,61% 4%,80% 1%,100% 3%,99% 50%,100% 97%,84% 100%,62% 96%,41% 100%,20% 96%,2% 100%,1% 50%)}
+.lead{font-size:19px;max-width:560px;margin:22px 0 0}
+.crab{position:absolute;right:-6px;top:120px;width:150px;transform:rotate(6deg);filter:drop-shadow(6px 8px 0 rgba(20,20,20,.85))}
+@media (max-width:560px){.crab{position:static;display:block;margin:16px 0 0 auto;width:120px}}
+.fact{margin-top:28px;background:var(--card);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:18px;padding:18px 20px}
+.fact b{color:var(--purple)}
+:root[data-theme="dark"] .fact b{color:#B98AFF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .fact b{color:#B98AFF}}
+.fact small{display:block;color:var(--muted);margin-top:6px;font-size:13px}
+h2{font-weight:900;text-transform:uppercase;letter-spacing:-1px;font-size:clamp(28px,6vw,40px);line-height:1;margin:56px 0 8px;text-wrap:balance}
+h2 .hl{background:var(--yellow);color:var(--ink);padding:0 8px}
+.sub{color:var(--muted);margin:0 0 20px}
+.qs{display:grid;gap:12px;counter-reset:q}
+.q{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px}
+.q .n{width:52px;height:52px;border-radius:14px;background:var(--teal);color:var(--ink);display:grid;place-items:center;font-weight:900;font-size:24px}
+.q h3{margin:2px 0 4px;font-size:19px;font-weight:800}
+.q p{margin:0;color:var(--muted)}
+.q em{font-style:normal;font-family:var(--hand);font-size:22px;color:var(--orange)}
+.copy{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:18px;margin-top:14px;box-shadow:6px 6px 0 var(--ink)}
+.copy .top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px 0 18px}
+.copy .label{font-weight:800;font-size:15px}
+.copy .label span{display:inline-block;background:var(--tealbg);color:var(--fg);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:6px;letter-spacing:.5px}
+.copy pre{margin:0;padding:10px 18px 18px;white-space:pre-wrap;font-family:var(--sans);font-size:15.5px;line-height:1.55;color:var(--fg)}
+.copy mark{background:var(--yellow);color:var(--ink);border-radius:4px;padding:0 3px}
+button.cp{font:700 14px var(--sans);background:var(--purple);color:#fff;border:0;border-radius:30px;padding:9px 16px;cursor:pointer;flex:none}
+button.cp:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button.cp.ok{background:var(--teal);color:var(--ink)}
+.grid{display:grid;gap:16px}
+.end{margin-top:56px;background:var(--ink);color:#fff;border-radius:24px;padding:26px 24px;position:relative;overflow:hidden}
+.end h2{margin:0;color:#fff}
+.end p{color:#ddd;max-width:520px}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;text-decoration:none;border-radius:40px;padding:14px 22px;border:3px solid #fff}
+.btn.a{background:var(--orange);color:var(--ink);border-color:var(--orange)}
+.btn.b{color:#fff}
+.btn:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.octo{position:absolute;right:-10px;bottom:-14px;width:150px;opacity:.95}
+@media (max-width:560px){.octo{display:none}}
+.note{font-family:var(--hand);font-size:24px;color:var(--purple);transform:rotate(-2deg);display:inline-block;margin-top:10px}
+footer{margin-top:28px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){button.cp{transition:background .2s}}
+</style>
+
+</head><body>
+<div class="wrap">
+<header><span class="logo"><img src="/briefing/logo.png" alt="Island Co."></span><span class="ig">@islandco.mkt</span></header>
+
+<section class="hero">
+<span class="tag">BRIEFING ISLAND</span>
+<h1>Peça melhor,<br>receba melhor</h1>
+<div class="strip">a IA não adivinha</div>
+<p class="lead">As 5 perguntas que a gente responde antes de pedir qualquer coisa pra IA, e 10 pedidos prontos pra copiar, colar e trocar o que está em amarelo.</p>
+<img class="crab" src="/briefing/caranguejo.png" alt="">
+</section>
+
+<div class="fact">Em 2026, os pedidos feitos pra IA nas empresas brasileiras cresceram <b>240%</b>. A pesquisa não mostra se isso virou resultado. Quase sempre, o que falta é briefing.
+<small>Fonte: levantamento da Luria publicado em O Hoje, 08/10/2026</small></div>
+
+<h2>As <span class="hl">5 perguntas</span></h2>
+<p class="sub">Responda as cinco antes de pedir. Se travou em alguma, é ali que o resultado ia dar errado.</p>
+<div class="qs">
+<div class="q"><div class="n">1</div><div><h3>Pra quem é?</h3><p>Uma pessoa real, não "todo mundo". Profissão, cidade, momento de vida. <em>donas de salão em Ipatinga</em></p></div></div>
+<div class="q"><div class="n">2</div><div><h3>Qual problema ela tem?</h3><p>A dor ou a dúvida que faz ela parar pra ler. <em>agenda vazia no meio da semana</em></p></div></div>
+<div class="q"><div class="n">3</div><div><h3>O que precisa acontecer?</h3><p>Uma ação só: chamar no WhatsApp, salvar, agendar, comprar. <em>chamar no WhatsApp</em></p></div></div>
+<div class="q"><div class="n">4</div><div><h3>O que evitar?</h3><p>Tom, palavras, promessas e assuntos fora. <em>sem termo técnico, sem prometer preço</em></p></div></div>
+<div class="q"><div class="n">5</div><div><h3>Como vou medir?</h3><p>O número que diz se funcionou. <em>quantas conversas chegaram</em></p></div></div>
+</div>
+
+<h2>O modelo <span class="hl">em branco</span></h2>
+<p class="sub">Copie, preencha o que está em amarelo e cole na IA.</p>
+<div id="modelo"></div>
+
+<h2>10 pedidos <span class="hl">prontos</span></h2>
+<p class="sub">Troque o que está em amarelo pelo seu negócio. Quanto mais específico, melhor a resposta.</p>
+<div class="grid" id="lista"></div>
+
+<div class="end">
+<h2>Quer que a gente faça com você?</h2>
+<p>No diagnóstico Island você responde 6 perguntas sobre o seu negócio e recebe a direção certa pra conteúdo, anúncio e site.</p>
+<div class="btns">
+<a class="btn a" href="https://onboarding.islandcompany.space/?utm_source=instagram&utm_medium=dm&utm_campaign=briefing" target="_blank" rel="noopener">Fazer o diagnóstico</a>
+<a class="btn b" href="https://wa.me/5531988690118?text=Vim%20pelo%20Briefing%20Island" target="_blank" rel="noopener">Falar no WhatsApp</a>
+</div>
+<span class="note" style="color:var(--teal)">novos horizontes exigem direção</span>
+<img class="octo" src="/briefing/polvo.png" alt="">
+</div>
+<footer>Island Company · islandcompany.space · WhatsApp (31) 98869-0118</footer>
+</div>
+
+<script>
+const H = s => s.replace(/\[([^\]]+)\]/g, '<mark>[$1]</mark>');
+const modelo = {label:'Modelo de briefing', tag:'qualquer pedido', text:
+`Você é [especialista em marketing para pequenos negócios].
+Crie [o que você quer: um carrossel de 7 slides / uma legenda / um anúncio].
+
+1. Para quem: [quem é a pessoa, onde mora, o que faz]
+2. Problema: [a dor ou dúvida dela]
+3. O que precisa acontecer: [chamar no WhatsApp / salvar / agendar]
+4. Evite: [termos técnicos, promessas de preço, tom formal]
+5. Vou medir por: [conversas no WhatsApp / salvamentos / agendamentos]
+
+Negócio: [nome, cidade, o que vende, diferencial real]
+Tom de voz: [leve e direto / acolhedor / técnico]
+Antes de responder, me faça até 3 perguntas se faltar informação.`};
+const lista = [
+ {label:'Carrossel de Instagram', tag:'post', text:`Crie um carrossel de 7 slides para [donas de salão em Ipatinga] que [estão com a agenda vazia no meio da semana]. Objetivo: [chamar no WhatsApp]. Slide 1 com um gancho que gere curiosidade, slides do meio com uma dica prática por slide, último slide com CTA para [comentar AGENDA]. Evite [termos técnicos e promessas de resultado]. Escreva só o texto de cada slide, curto.`},
+ {label:'Legenda', tag:'post', text:`Escreva uma legenda de até 900 caracteres para um post sobre [tema]. Público: [quem]. A primeira linha precisa fazer a pessoa parar de rolar. Termine com uma pergunta para gerar comentário e o CTA [salvar o post]. Tom [leve e direto], sem hashtags no meio do texto, no máximo 5 hashtags no final.`},
+ {label:'Roteiro de Reels', tag:'vídeo', text:`Crie um roteiro de Reels de [30 segundos] para [público]. Estrutura: gancho falado nos 3 primeiros segundos, 3 pontos rápidos, CTA para [seguir o perfil]. Indique o que aparece na tela em cada parte e o texto na tela. Linguagem falada, frases curtas. Tema: [tema].`},
+ {label:'Anúncio no Meta', tag:'anúncio', text:`Escreva 3 versões de anúncio para Instagram e Facebook. Negócio: [o que vende, cidade]. Público: [quem]. Objetivo: [mensagens no WhatsApp]. Para cada versão: título de até 40 caracteres, texto principal com os primeiros 125 caracteres fortes e CTA. Use o diferencial real: [diferencial]. Não prometa [preço / resultado garantido].`},
+ {label:'Primeira resposta no WhatsApp', tag:'atendimento', text:`Escreva a primeira mensagem para quem chama no WhatsApp de [negócio] vindo de um anúncio sobre [produto ou serviço]. Ela precisa ser curta, agradecer o contato e fazer 1 pergunta que ajude a entender o que a pessoa precisa. Tom [simpático e direto]. Dê 3 versões.`},
+ {label:'Cliente que sumiu', tag:'atendimento', text:`Escreva 3 mensagens de retomada para um cliente que pediu orçamento de [serviço] há [3 dias] e não respondeu mais. Sem pressão, sem parecer robô, cada uma com um motivo diferente para responder (tirar dúvida, condição até [data], uma pergunta simples).`},
+ {label:'Orçamento', tag:'vendas', text:`Organize uma mensagem de orçamento para [serviço] com: o que está incluso, prazo, valor de [R$ X], forma de pagamento e próximo passo. Deixe fácil de ler no celular, com no máximo 8 linhas. Termine com uma pergunta que leve ao fechamento.`},
+ {label:'Bio do Instagram', tag:'perfil', text:`Escreva 5 opções de bio de Instagram para [negócio] em [cidade]. Cada uma com até 150 caracteres: o que faz, para quem, um diferencial real e um CTA para o link. Sem emojis em excesso.`},
+ {label:'Post do Google Meu Negócio', tag:'local', text:`Escreva um post para o Perfil da Empresa no Google de [negócio] em [bairro, cidade] sobre [novidade ou oferta]. Até 600 caracteres, com o nome do bairro e da cidade no texto e um CTA para [ligar / pedir rota / chamar no WhatsApp].`},
+ {label:'Ideias de conteúdo do mês', tag:'pauta', text:`Crie uma pauta de 12 posts para [negócio] no mês de [mês]. Para cada post: formato (carrossel, reels ou foto), tema, gancho da capa e CTA. Misture 5 educativos, 4 de bastidor ou prova e 3 de oferta. Considere datas do mês como [Black Friday 27/11]. Use só fatos que eu possa comprovar.`}
+];
+function card(item, id){
+  const d = document.createElement('div'); d.className='copy';
+  d.innerHTML = `<div class="top"><div class="label">${item.label}<span>${item.tag}</span></div><button class="cp" id="${id}" type="button">Copiar</button></div><pre>${H(item.text)}</pre>`;
+  const b = d.querySelector('button');
+  b.addEventListener('click', () => {
+    const done = () => { b.textContent='Copiado'; b.classList.add('ok'); setTimeout(()=>{b.textContent='Copiar'; b.classList.remove('ok')},1800); };
+    const sel = () => { const r=document.createRange(); r.selectNodeContents(d.querySelector('pre')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent='Selecionado, copie'; };
+    try { navigator.clipboard.writeText(item.text).then(done, sel); } catch(e){ sel(); }
+  });
+  return d;
+}
+document.getElementById('modelo').appendChild(card(modelo,'cp-modelo'));
+const L = document.getElementById('lista'); lista.forEach((it,i)=>L.appendChild(card(it,'cp-'+i)));
+</script>
+
+</body></html>
