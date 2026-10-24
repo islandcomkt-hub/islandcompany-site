@@ -650,7 +650,8 @@ export function createScene(canvas, data, opts) {
       const x = c.x + Math.cos(a) * F.rad, z = c.z + Math.sin(a) * F.rad, dir = Math.sign(F.sp), hx = -Math.sin(a) * dir, hz = Math.cos(a) * dir;
       const lt = (t + F.ph * 3.1) % F.cyc, up = lt < 2.8 ? lt / 2.8 : lt < 14 ? 1 : lt < 16.8 ? 1 - (lt - 14) / 2.8 : 0, e = up * up * (3 - 2 * up);   // emerge, nada, submerge
       F.f.position.y = -1.75 * (1 - e) + Math.sin(t * 2.1 + F.ph) * 0.02 - 0.04; F.f.rotation.z = (1 - e) * (lt < 8 ? -0.35 : 0.35);
-      F.g.position.set(x, 0, z);   // grupo fixo na linha d'água: a onda da frente não afunda e pisca F.g.rotation.y = Math.atan2(hz, -hx) + Math.sin(t * 1.6 + F.ph) * 0.06;
+      F.g.position.set(x, 0, z);   // grupo fixo na linha d'água: a onda da frente não afunda
+      F.g.rotation.y = Math.atan2(hz, -hx) + Math.sin(t * 1.6 + F.ph) * 0.06;
       F.bm.uniforms.uT.value = t; F.bm.uniforms.uK.value = e; F.g.visible = e > 0.002;
       if (e > 0.03 && t - F.last > 0.07) { F.last = t; trailPush(x, z, hx, hz, t, e); } });
     { const cyc = Math.floor(t / KCYC), lt = t - cyc * KCYC;
