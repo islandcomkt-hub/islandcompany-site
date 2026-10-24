@@ -571,7 +571,7 @@ export function createScene(canvas, data, opts) {
     return a.map((v, j) => j === 0 ? h : (v.isColor ? v.clone().lerp(b[j], e) : v + (b[j] - v) * e));
   }
   api.setHour = function (h) {
-    h = ((h % 24) + 24) % 24; TOD.h = h; const K = lerpKey(h);
+    h = ((h % 24) + 24) % 24; TOD.h = h; TOD.at = performance.now(); const K = lerpKey(h);
     FOGC.copy(K[1]); scene.fog.color.copy(K[1]); renderer.setClearColor(K[1], 1);
     hemi.color.copy(K[2]); hemi.groundColor.copy(K[3]); hemi.intensity = K[4];
     moon.color.copy(K[5]); moon.intensity = K[6];
@@ -642,8 +642,18 @@ export function createScene(canvas, data, opts) {
   krWater.position.y = 0.065; krWater.renderOrder = 2; krak.add(krWater);
   let kSpot = -1, kCycle = -1, kN = 5;
   // sombra de um monstro gigante passando por baixo d'água
-  const mon = new THREE.TextureLoader().load('/assets/monster-shadow.webp'); mon.colorSpace = THREE.NoColorSpace; mon.repeat.set(1 / 8, 1 / 6); mon.generateMipmaps = true;
-  const monster = new THREE.Mesh(new THREE.PlaneGeometry(36, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#02040c', alphaMap: mon, transparent: true, opacity: 0.13, depthWrite: false, fog: false }));
+  // sombra do monstro: 96 quadros da referência, com mistura entre quadros para o rabo ficar fluido
+  const mon = new THREE.TextureLoader().load('/assets/monster-shadow.webp'); mon.colorSpace = THREE.NoColorSpace;
+  const MCOLS = 12, MROWS = 8, MFR = 96;
+  const monMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false,
+    uniforms: { uMap: { value: mon }, uF0: { value: new THREE.Vector2() }, uF1: { value: new THREE.Vector2() }, uMix: { value: 0 }, uOp: { value: 0 } },
+    vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader: 'uniform sampler2D uMap; uniform vec2 uF0; uniform vec2 uF1; uniform float uMix; uniform float uOp; varying vec2 vU; void main(){ vec2 s = vec2(1./' + MCOLS + '., 1./' + MROWS + '.); float a = mix(texture2D(uMap, uF0 + vU*s).g, texture2D(uMap, uF1 + vU*s).g, uMix); a *= uOp; if(a < .003) discard; gl_FragColor = vec4(.008,.016,.047, a); }' });
+  const monster = new THREE.Mesh(new THREE.PlaneGeometry(47, 83).rotateX(-Math.PI / 2), monMat); monster.visible = false;
+  const monFrame = (i, v) => v.set((i % MCOLS) / MCOLS, 1 - (Math.floor(i / MCOLS) + 1) / MROWS);
+  // passa só duas vezes por dia: um horário sorteado de manhã cedo e outro no fim da tarde (sorteio fixo por dia)
+  const MON_DUR = 95, MON_FORCE = /[?&]monstro/.test(location.search);
+  function monSlots() { const d = new Date(), seed = d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate(); return [6 * 3600 + hrand(seed) * 2.5 * 3600, 16.5 * 3600 + hrand(seed + 0.37) * 1.5 * 3600]; }
   monster.position.y = 0.045; monster.renderOrder = 1; scene.add(monster);
 
   api.render = function (ms) {
@@ -675,8 +685,15 @@ export function createScene(canvas, data, opts) {
       const W = krWater.material.uniforms; W.uT.value = t; W.uA.value = act * act * (3 - 2 * act); W.uB.value = lt > KLEAD && lt < KLEAD + 2.2 ? (lt - KLEAD) / 2.2 : 0; krWater.visible = act > 0;
       tent.forEach((T, k) => { T.u.value = t; if (!T.on) { T.g.visible = false; return; } const tt = lt - T.delay; const up = tt < 0 ? 0 : tt < 2.6 ? tt / 2.6 : tt < 10.5 ? 1 : tt < 13.1 ? 1 - (tt - 10.5) / 2.6 : 0, e = up * up * (3 - 2 * up);
         T.mesh.position.y = -T.H * T.mesh.scale.y * (1 - e) * 1.05 - 0.2; T.g.visible = up > 0; T.ring.scale.setScalar(0.5 + e * 0.9 + Math.sin(t * 2 + k) * 0.05); T.ring.material.opacity = 0.16 + 0.34 * Math.sin(Math.PI * Math.min(1, up)) ; }); }
-    { const L = 320, s2 = (((t + 40) * 2.6) % L) - L / 2, dz = Math.cos(t * 0.07) * 0.07 * 5 / 2.6; monster.position.x = s2; monster.position.z = 1 + Math.sin(t * 0.07) * 5; monster.rotation.y = Math.atan2(-1, -dz);
-      const fr = Math.floor(t * 8.3) % 48; mon.offset.set((fr % 8) / 8, 1 - (Math.floor(fr / 8) + 1) / 6); } waterMat.uniforms.uMoon.value.copy(moon.position).normalize();
+    { const sec = TOD.h * 3600 + (performance.now() - (TOD.at || 0)) / 1000;
+      let pr = -1; if (MON_FORCE) pr = (t % (MON_DUR + 8)) / MON_DUR; else for (const st of monSlots()) { const q = (sec - st) / MON_DUR; if (q >= 0 && q <= 1) pr = q; }
+      monster.visible = pr >= 0 && pr <= 1;
+      if (monster.visible) {   // de baixo à esquerda (perto da câmera) até o topo à direita, na diagonal
+        const ax = -95, az = 85, bx = 95, bz = -95, x = ax + (bx - ax) * pr, z = az + (bz - az) * pr + Math.sin(pr * 6.28) * 6;
+        const dx = bx - ax, dz = (bz - az) + Math.cos(pr * 6.28) * 6 * 6.28; monster.position.x = x; monster.position.z = z; monster.rotation.y = Math.atan2(-dx, -dz);
+        const ft = t * 16.7, f0 = Math.floor(ft) % MFR; monFrame(f0, monMat.uniforms.uF0.value); monFrame((f0 + 1) % MFR, monMat.uniforms.uF1.value); monMat.uniforms.uMix.value = ft - Math.floor(ft);
+        monMat.uniforms.uOp.value = 0.13 * Math.min(1, pr * 8, (1 - pr) * 8);
+      } } waterMat.uniforms.uMoon.value.copy(moon.position).normalize();
     _md.copy(moon.position).normalize();
     shafts.forEach((m, i) => { const c = islands[i].grp.position; m.quaternion.setFromUnitVectors(_up, _md); m.position.set(c.x, P + 0.2, c.z).addScaledVector(_md, 46); const u = m.material.uniforms; u.uTime.value = t; u.uK.value = uBoost[i]; u.uC.value.copy(m.userData.c).lerp(accents[i], uBoost[i] * 0.6); });
     const tk = focused >= 0 ? 1 : 0; accentK += (tk - accentK) * 0.08;
