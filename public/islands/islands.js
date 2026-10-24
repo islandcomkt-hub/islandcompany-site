@@ -165,7 +165,7 @@
     }, function (e) { fail(e && e.message || e); });
     return loading;
   }
-  function sizeCanvas() { if (!sc) return; sc.resize(W, HO, Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2)); }
+  function sizeCanvas() { if (!sc) return; sc.resize(W, HO, Math.min(Math.max(window.devicePixelRatio || 1, mobile ? 1.5 : 1.5), mobile ? 2 : 2.5)); }
 
   /* ---------- transições ---------- */
   function request(target) {

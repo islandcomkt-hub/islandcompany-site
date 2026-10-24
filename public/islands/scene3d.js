@@ -1,7 +1,7 @@
 /* Cena 3D do arquipélago (Three.js, tudo procedural: sem modelos externos, sem texturas externas).
    Um oceano único (shader), seis ilhas modeladas em código e o barco. Exporta createScene(canvas, data). */
 import * as THREE from './vendor/three.module.min.js';
-import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from './vendor/BufferGeometryUtils.js';
 
 const P = 3.4;                 // altura do platô das ilhas
 const FOV = 32, TAN = Math.tan(FOV * Math.PI / 360);
@@ -111,16 +111,19 @@ function makeRock(i, R) {
     else { tmp.copy(c2).lerp(c3, clamp(nz * 1.6 - 0.2, 0, 1)); if (y > P - 1.6 && nz > 0.38) tmp.lerp(moss, 0.7); }
     cols[k * 3] = tmp.r; cols[k * 3 + 1] = tmp.g; cols[k * 3 + 2] = tmp.b;
   }
-  for (let f = 0; f < n / 3; f++) { const j = 0.84 + 0.3 * hash3(f * 0.37, s, f * 0.11); for (let q = 0; q < 3; q++) { const o = (f * 3 + q) * 3; cols[o] *= j; cols[o + 1] *= j; cols[o + 2] *= j; } }
-  base.setAttribute('color', new THREE.BufferAttribute(cols, 3)); base.deleteAttribute('uv'); base.computeVertexNormals();
-  const geos = [base], r = rng(s * 3.1);
+  for (let k = 0; k < n; k++) {   // variação suave (antes: por face, dava aspecto de mosaico)
+    const j = 0.9 + 0.2 * fbm(pos.getX(k) * 0.35 + s, pos.getY(k) * 0.6, pos.getZ(k) * 0.35 - s);
+    cols[k * 3] *= j; cols[k * 3 + 1] *= j; cols[k * 3 + 2] *= j;
+  }
+  base.setAttribute('color', new THREE.BufferAttribute(cols, 3)); base.deleteAttribute('uv'); base.deleteAttribute('normal');
+  const geos = [mergeVertices(base, 1e-4)], r = rng(s * 3.1);
   for (let k = 0; k < 7; k++) {   // pedras soltas na borda
-    const th = r() * Math.PI * 2, rad = rr(th, R, s) * (1.04 + r() * 0.25), g = new THREE.IcosahedronGeometry(1, 2), p = g.attributes.position, sc = 0.9 + r() * 1.5, sy = 0.9 + r() * 1.7, cc = new THREE.Color().copy(c2).lerp(c1, r() * 0.7), ca = new Float32Array(p.count * 3);
+    const th = r() * Math.PI * 2, rad = rr(th, R, s) * (1.04 + r() * 0.25); let g = new THREE.IcosahedronGeometry(1, 3); const p = g.attributes.position, sc = 0.9 + r() * 1.5, sy = 0.9 + r() * 1.7, cc = new THREE.Color().copy(c2).lerp(c1, r() * 0.7), ca = new Float32Array(p.count * 3);
     for (let q = 0; q < p.count; q++) { const nn = fbm(p.getX(q) * 2 + k, p.getY(q) * 2, p.getZ(q) * 2); p.setXYZ(q, p.getX(q) * sc * (0.8 + nn * 0.5), p.getY(q) * sy * (0.7 + nn * 0.6), p.getZ(q) * sc * (0.8 + nn * 0.5)); ca[q * 3] = cc.r; ca[q * 3 + 1] = cc.g; ca[q * 3 + 2] = cc.b; }
-    g.setAttribute('color', new THREE.BufferAttribute(ca, 3)); g.deleteAttribute('uv'); g.translate(Math.cos(th) * rad, sy * 0.25 - 0.4, Math.sin(th) * rad); geos.push(g);
+    g.setAttribute('color', new THREE.BufferAttribute(ca, 3)); g.deleteAttribute('uv'); g.deleteAttribute('normal'); g = mergeVertices(g, 1e-4); g.translate(Math.cos(th) * rad, sy * 0.25 - 0.4, Math.sin(th) * rad); geos.push(g);
   }
   const m = mergeGeometries(geos); m.computeVertexNormals();
-  return new THREE.Mesh(m, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.95, metalness: 0 }));
+  return new THREE.Mesh(m, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: false, roughness: 0.9, metalness: 0 }));
 }
 
 /* ---------- arquiteturas ---------- */
@@ -272,30 +275,41 @@ const WATER_F = `
 precision highp float;
 varying vec3 vW; uniform float uTime; uniform vec4 uIsl[6]; uniform vec3 uAcc[6]; uniform float uBoost[6]; uniform vec3 uCam; uniform vec3 uFog; uniform vec3 uMoon;
 float h2(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
-float n2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y); }
+float n2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*f*(f*(f*6.-15.)+10.); return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y); }
+const mat2 RM = mat2(.8,.6,-.6,.8);
+float fb(vec2 p){ float a=.5, s=0.; for(int i=0;i<4;i++){ s+=a*n2(p); p=RM*p*2.03+3.1; a*=.5; } return s; }
 float rr(float th, float R, float s){ return R*(1.+.16*sin(3.*th+s)+.09*sin(5.*th+s*2.3)+.05*sin(8.*th)); }
 void main(){
   vec2 p = vW.xz; float t = uTime;
   vec2 g = vec2(0.);
   vec2 k1 = vec2(.21,.08), k2 = vec2(-.13,.19), k3 = vec2(.36,-.27);
   g += k1*.5*cos(dot(k1,p)*1.7+t*.55) + k2*.42*cos(dot(k2,p)*2.1-t*.47) + k3*.14*cos(dot(k3,p)*3.1+t*.9);
+  float dc0 = length(uCam - vW), fade = 1. - smoothstep(60., 260., dc0);
+  vec2 k4 = vec2(.62,.31), k5 = vec2(-.44,.71), k6 = vec2(.93,-.58);
+  g += (k4*.09*cos(dot(k4,p)*2.6+t*1.3) + k5*.07*cos(dot(k5,p)*2.9-t*1.15) + k6*.045*cos(dot(k6,p)*3.4+t*1.7)) * (.4 + .6*fade);
+  vec2 q = p*.55 + vec2(t*.18, -t*.13);
+  float e = .35, c0 = fb(q);
+  vec2 gn = vec2(fb(q+vec2(e,0.))-c0, fb(q+vec2(0.,e))-c0)/e;
+  g += gn * .16 * fade;
   vec3 n = normalize(vec3(-g.x*.45, 1., -g.y*.45));
   vec3 V = normalize(uCam - vW); float fr = pow(1.-max(dot(n,V),0.), 3.);
   vec3 deep = vec3(.034,.012,.088), mid = vec3(.100,.046,.225);
-  vec3 col = mix(deep, mid, clamp(fr*.9 + n2(p*.06)*.22, 0., 1.));
+  vec3 col = mix(deep, mid, clamp(fr*.9 + fb(p*.035)*.26, 0., 1.));
+  col += vec3(.05,.03,.10) * smoothstep(.55,.85, fb(p*.12 + vec2(-t*.04, t*.03))) * .5;
   vec3 R = reflect(-V, n); float sp = max(dot(R, uMoon), 0.);
   col += vec3(.78,.66,1.)*pow(sp, 70.)*.45 + vec3(.20,.11,.40)*pow(sp, 8.)*.5;
-  col += vec3(.5,.4,.9)*pow(n2(p*.8+t*.1), 3.)*pow(sp,2.)*.2;
+  col += vec3(.5,.4,.9)*pow(fb(p*.8+t*.1), 2.)*pow(sp,2.)*.35*fade;
+  float fN = fb(p*1.6 + vec2(t*.35,-t*.25)), rN = fb(p*.45);
   for(int i=0;i<6;i++){
     vec2 d = p - uIsl[i].xy; float dist = length(d), th = atan(d.y, d.x), w = rr(th, uIsl[i].z, uIsl[i].w)*1.02, r = dist - w;
     float boost = 1. + uBoost[i]*1.6;
     float sh = smoothstep(11., 0., r);
     col += uAcc[i]*(sh*.10 + sh*sh*.22)*boost*step(-.4, r);
     col += vec3(.04,.30,.36)*smoothstep(4.5,0.,r)*.30*step(-.4,r);
-    float f = (1.-smoothstep(0.,1.4,r)) * step(-.5, r) * (.55 + .45*n2(p*2.2 + vec2(t*.35,-t*.25)));
+    float f = (1.-smoothstep(0.,1.4,r)) * step(-.5, r) * (.5 + .5*fN);
     f *= .62 + .38*sin(t*1.2 + dist*1.3);
     col += vec3(.80,.88,1.)*f*.45;
-    float rip = smoothstep(.95,1.,sin(r*2.4 - t*.8 + n2(p*.6)*4.)) * smoothstep(9.,1.,r) * step(0.,r);
+    float rip = smoothstep(.95,1.,sin(r*2.4 - t*.8 + rN*4.)) * smoothstep(9.,1.,r) * step(0.,r);
     col += uAcc[i]*rip*.04*boost;
   }
   float dc = length(uCam - vW); col = mix(uFog, col, exp(-dc*.0042));

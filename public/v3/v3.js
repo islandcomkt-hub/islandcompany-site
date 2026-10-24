@@ -410,6 +410,15 @@
   window.IslandPhone = { open: phone, close: closePhone };
   window.IslandPortfolio = { open: open, close: close };
   document.addEventListener('click', function (e) { var c = e.target.closest && e.target.closest('.circular-carousel__card'); if (c) e.preventDefault(); }, true);
+  /* arrastar o carrossel segurando em cima do card (desktop): o <a> nativo puxava um "drag" de link e cancelava o gesto */
+  document.addEventListener('dragstart', function (e) { if (e.target.closest && e.target.closest('.circular-carousel')) e.preventDefault(); }, true);
+  (function () {
+    var sx = 0, sy = 0, moved = false, down = false;
+    document.addEventListener('pointerdown', function (e) { if (!(e.target.closest && e.target.closest('.circular-carousel'))) return; down = true; moved = false; sx = e.clientX; sy = e.clientY; }, true);
+    document.addEventListener('pointermove', function (e) { if (down && !moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 6) moved = true; }, true);
+    document.addEventListener('pointerup', function () { down = false; setTimeout(function () { moved = false; }, 0); }, true);
+    document.addEventListener('click', function (e) { if (moved && e.target.closest && e.target.closest('.circular-carousel')) { e.preventDefault(); e.stopImmediatePropagation(); moved = false; } }, true);
+  })();
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href]');
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;

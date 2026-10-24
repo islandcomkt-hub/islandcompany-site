@@ -861,3 +861,20 @@ header{padding-top:0!important}
 @media (max-width:820px){.hero{padding-top:96px!important}}
 /* carrossel: título mais perto do carrossel, sem colar */
 .pf .portfolio-heading{margin-bottom:clamp(14px,2vw,32px)}
+
+/* ===== rodada: identidade própria por card de serviço ===== */
+.svc[data-island=performance]{--a:#FFB347;--ad:#C46A00;--bg:#FFF7EC;--bd:#FFE2BD;--dk:#3A2104;--dk2:#1F1102}
+.svc[data-island=tech]{--a:#82ABFF;--ad:#2F62D6;--bg:#F1F5FF;--bd:#D6E3FF;--dk:#0F2350;--dk2:#08142E}
+.svc[data-island=media]{--a:#00C85A;--ad:#00A84B;--bg:#EEFBF3;--bd:#C9F0D9;--dk:#0B3B24;--dk2:#062214}
+.svc[data-island=strategy]{--a:#7DDDE6;--ad:#11929E;--bg:#EEFBFC;--bd:#C7EEF2;--dk:#0B3640;--dk2:#061F25}
+.svc[data-island]{background:linear-gradient(135deg,var(--bg),#fff 120%);border-color:var(--bd)}
+.svc[data-island]::after{content:"";position:absolute;right:-22px;bottom:-26px;width:86px;height:86px;border-radius:50%;background:radial-gradient(circle,var(--a) 0,transparent 70%);opacity:.22;z-index:-1;transition:opacity .4s,transform .6s var(--ez)}
+.svc[data-island] .svc-ic{background:color-mix(in srgb,var(--a) 22%,#fff);color:var(--ad)}
+.svc[data-island] .svc-ar{color:var(--ad)}
+.svc[data-island]:hover,.svc[data-island]:focus-visible,.svc[data-island].on{background:linear-gradient(135deg,var(--dk),var(--dk2));border-color:var(--dk);color:#fff;box-shadow:0 20px 34px -22px var(--dk)}
+.svc[data-island]:hover::after,.svc[data-island].on::after,.svc[data-island]:focus-visible::after{opacity:.5;transform:scale(1.5)}
+.svc[data-island]:hover .svc-ic,.svc[data-island]:focus-visible .svc-ic,.svc[data-island].on .svc-ic{background:var(--a);color:var(--dk2)}
+.svc[data-island]:hover .svc-ar,.svc[data-island].on .svc-ar,.svc[data-island]:focus-visible .svc-ar{color:var(--a)}
+.circular-carousel,.circular-carousel *{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.circular-carousel{cursor:grab}
+.circular-carousel[data-dragging]{cursor:grabbing}
