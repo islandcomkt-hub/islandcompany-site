@@ -389,7 +389,9 @@ export function createScene(canvas, data, opts) {
     // anel de luz da ilha (hover/foco)
     const isl = { grp, R, phi, u, t, qx, qz, wr, seed: SEEDS[i], extras: {} };
     if (i === 0) { // feixe do farol
-      const beam = new THREE.Mesh(new THREE.ConeGeometry(3.4, 26, 24, 1, true).translate(0, -12, 0).rotateZ(Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0.055, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+      const beam = new THREE.Mesh(new THREE.ConeGeometry(3.4, 26, 24, 1, true).translate(0, -12, 0).rotateZ(Math.PI / 2), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+        vertexShader: 'varying vec2 vU; varying vec3 vN; varying vec3 vV; void main(){ vU = uv; vec4 w = modelMatrix*vec4(position,1.); vN = normalize(mat3(modelMatrix)*normal); vV = normalize(cameraPosition - w.xyz); gl_Position = projectionMatrix*viewMatrix*w; }',
+        fragmentShader: 'varying vec2 vU; varying vec3 vN; varying vec3 vV; void main(){ float e = pow(abs(dot(vN, vV)), 2.2); float len = vU.y; float a = e * pow(len, 1.6) * smoothstep(0., .25, len) * .26; gl_FragColor = vec4(vec3(1., .74, .38), a); }' }));
       const piv = new THREE.Group(); piv.position.set(-2.6, P + 10.0, -3.2); piv.add(beam); beam.position.x = 0; grp.add(piv); isl.extras.beam = piv;
     }
     grp.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = true; } });
@@ -586,20 +588,20 @@ export function createScene(canvas, data, opts) {
   const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.13, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.07, bevelSegments: 4, curveSegments: 24 }).translate(0, -0.2, -0.065);
   { const fp = finGeo.attributes.position; for (let q = 0; q < fp.count; q++) { const y = fp.getY(q), k = clamp(y / 1.5, 0, 1); fp.setZ(q, fp.getZ(q) * (1 - 0.75 * k)); } finGeo.computeVertexNormals(); }   // afina para a ponta
   // rastro de espuma: partículas que nascem atrás da barbatana e se abrem em V
-  const TR = 150, trG = new THREE.BufferGeometry(), trB = new Float32Array(TR * 3), trD = new Float32Array(TR * 4);
-  trG.setAttribute('position', new THREE.BufferAttribute(trB, 3)); trG.setAttribute('aD', new THREE.BufferAttribute(trD, 4));
+  const TR = 150, trG = new THREE.BufferGeometry(), trB = new Float32Array(TR * 3), trD = new Float32Array(TR * 4), trS = new Float32Array(TR);
+  trG.setAttribute('position', new THREE.BufferAttribute(trB, 3)); trG.setAttribute('aD', new THREE.BufferAttribute(trD, 4)); trG.setAttribute('aS', new THREE.BufferAttribute(trS, 1));
   const trMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uPx: ffMat.uniforms.uPx, uC: waterMat.uniforms.uFoamC },
-    vertexShader: 'attribute vec4 aD; uniform float uT; uniform float uPx; varying float vA; void main(){ float a = clamp((uT - aD.w)/2.4, 0., 1.); vec3 p = position + vec3(aD.x, 0., aD.y)*aD.z*a*1.6; vA = (1.-a)*step(aD.w, uT)*step(.0001, aD.w); vec4 mv = modelViewMatrix*vec4(p,1.); gl_PointSize = (2.6 + a*7.)*uPx*520./-mv.z; gl_Position = projectionMatrix*mv; }',
+    vertexShader: 'attribute vec4 aD; attribute float aS; uniform float uT; uniform float uPx; varying float vA; void main(){ float a = clamp((uT - aD.w)/2.4, 0., 1.); vec3 p = position + vec3(aD.x, 0., aD.y)*aD.z*a*1.6; vA = (1.-a)*aS*step(aD.w, uT)*step(.0001, aD.w); vec4 mv = modelViewMatrix*vec4(p,1.); gl_PointSize = (2.6 + a*7.)*uPx*520./-mv.z; gl_Position = projectionMatrix*mv; }',
     fragmentShader: 'uniform vec3 uC; varying float vA; void main(){ vec2 d = gl_PointCoord-.5; float r = length(d)*2.; float ring = pow(smoothstep(1.,.1,r), 1.4)*(.75 + .25*smoothstep(.2,.7,r)); float a = ring*vA*.42; if(a<.01) discard; gl_FragColor = vec4(mix(uC, vec3(1.), .4), a); }' });
   const trail = new THREE.Points(trG, trMat); trail.frustumCulled = false; trail.position.y = 0.06; trail.renderOrder = 3; scene.add(trail); let trI = 0;
-  function trailPush(x, z, hx, hz, t) { for (const sd of [-1, 1]) { const j = trI++ % TR; trB[j * 3] = x - hx * 0.9; trB[j * 3 + 1] = 0; trB[j * 3 + 2] = z - hz * 0.9; trD[j * 4] = -hz * sd; trD[j * 4 + 1] = hx * sd; trD[j * 4 + 2] = 0.7 + Math.random() * 0.5; trD[j * 4 + 3] = t; } trG.attributes.position.needsUpdate = true; trG.attributes.aD.needsUpdate = true; }
-  const bowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uC: waterMat.uniforms.uFoamC },
+  function trailPush(x, z, hx, hz, t, k) { for (const sd of [-1, 1]) { const j = trI++ % TR; trB[j * 3] = x - hx * 0.9; trB[j * 3 + 1] = 0; trB[j * 3 + 2] = z - hz * 0.9; trD[j * 4] = -hz * sd; trD[j * 4 + 1] = hx * sd; trD[j * 4 + 2] = 0.7 + Math.random() * 0.5; trD[j * 4 + 3] = t; trS[j] = k; } trG.attributes.position.needsUpdate = true; trG.attributes.aD.needsUpdate = true; trG.attributes.aS.needsUpdate = true; }
+  const bowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uK: { value: 1 }, uC: waterMat.uniforms.uFoamC },
     vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-    fragmentShader: 'uniform float uT; uniform vec3 uC; varying vec2 vU; void main(){ vec2 p = (vU-.5)*2.; float v = abs(p.y) - (p.x+1.)*.45; float line = smoothstep(.3,.0,abs(v))*smoothstep(1.,.2,p.x)*smoothstep(-1.,-.6,p.x); float n = .7+.3*sin(p.x*18.-uT*7.); gl_FragColor = vec4(mix(uC,vec3(1.),.5), line*n*.75); }' });
+    fragmentShader: 'uniform float uT; uniform float uK; uniform vec3 uC; varying vec2 vU; void main(){ vec2 p = (vU-.5)*2.; float v = abs(p.y) - (p.x+1.)*.45; float line = smoothstep(.3,.0,abs(v))*smoothstep(1.,.2,p.x)*smoothstep(-1.,-.6,p.x); float n = .7+.3*sin(p.x*18.-uT*7.); gl_FragColor = vec4(mix(uC,vec3(1.),.5), line*n*.75*uK); }' });
   const FINS = [[3, 17.5, 0.13, 0], [5, 17, -0.11, 2], [-1, 9, 0.14, 4]].map(([isl, rad, sp, ph]) => {
     const g = new THREE.Group(), f = new THREE.Mesh(finGeo, darkSkin); f.castShadow = true; g.add(f);
-    const bow = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.2).rotateX(-Math.PI / 2), bowMat); bow.position.set(0.15, 0.05, 0); bow.renderOrder = 3; g.add(bow);
-    g.scale.setScalar(1.9); scene.add(g); return { g, f, isl, rad, sp, ph, last: 0, px: 0, pz: 0 };
+    const bm = bowMat.clone(); bm.uniforms.uC = waterMat.uniforms.uFoamC; const bow = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.2).rotateX(-Math.PI / 2), bm); bow.position.set(0.15, 0.05, 0); bow.renderOrder = 3; g.add(bow);
+    g.scale.setScalar(1.9); scene.add(g); return { g, f, bm, isl, rad, sp, ph, last: 0, cyc: 20 + ph * 1.3 };
   });
   const foamMat = new THREE.MeshBasicMaterial({ color: '#cfd8ff', transparent: true, opacity: 0.22, depthWrite: false, fog: false });
   // kraken: tentáculos em mar aberto, somem e reaparecem em outro ponto
@@ -607,16 +609,17 @@ export function createScene(canvas, data, opts) {
   const krak = new THREE.Group(); scene.add(krak);
   const tent = [], KCYC = 17;
   for (let k = 0; k < 5; k++) {
-    const H = 6.4 + (k % 3) * 1.4, ph = k * 1.37, geo = new THREE.CylinderGeometry(0.07, 0.8, H, 18, 48).translate(0, H / 2, 0), gp = geo.attributes.position, cc = new Float32Array(gp.count * 3);
+    const H = 6.4 + (k % 3) * 1.4, ph = k * 1.37, geo = new THREE.CylinderGeometry(0.07, 0.8, H, 30, 80).translate(0, H / 2, 0), gp = geo.attributes.position, cc = new Float32Array(gp.count * 3);
     const base = new THREE.Color('#2e0f26'), tip = new THREE.Color('#a34a78'), sk = new THREE.Color('#f2c4d8'), tc = new THREE.Color();
     for (let q = 0; q < gp.count; q++) {   // degradê base→ponta e ventosas na face interna
       const y = gp.getY(q) / H, ang = Math.atan2(gp.getZ(q), gp.getX(q)); tc.copy(base).lerp(tip, Math.pow(y, 0.8));
-      if (Math.cos(ang) < -0.55 && Math.sin(y * H * 5.5) > 0.35 && y > 0.08) tc.lerp(sk, 0.75);
       cc[q * 3] = tc.r; cc[q * 3 + 1] = tc.g; cc[q * 3 + 2] = tc.b;
     }
-    geo.setAttribute('color', new THREE.BufferAttribute(cc, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cc, 3)); geo.setAttribute('aTU', geo.attributes.uv.clone());
     const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.38, metalness: 0.05, emissive: '#1a0614', emissiveIntensity: 0.6 }), u = { value: 0 };
-    m.onBeforeCompile = (sh) => { sh.uniforms.uT = u; sh.vertexShader = 'uniform float uT;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n float kk = clamp(position.y / ' + H.toFixed(2) + ', 0., 1.); float bb = kk*kk; float sw = sin(uT*.85 + ' + ph.toFixed(2) + ' + kk*2.6); transformed.x += sw*bb*1.6 + bb*kk*1.9; transformed.z += cos(uT*.6 + ' + ph.toFixed(2) + ' + kk*2.1)*bb*0.9; transformed.y -= bb*kk*1.5;'); };
+    m.onBeforeCompile = (sh) => { sh.uniforms.uT = u;
+      sh.fragmentShader = 'varying vec2 vTU;\n' + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n { float r = mix(.8, .07, vTU.y); float ph = -' + (H / 0.73 / 0.95).toFixed(3) + '*log(r); float al = (fract(ph) - .5)*.95*r; float du = vTU.x - .25; du -= floor(du + .5); float ar = du*6.2832*r; float d1 = length(vec2(al, ar - .3*r)); float al2 = (fract(ph + .5) - .5)*.95*r; float d2 = length(vec2(al2, ar + .3*r)); float d = min(d1, d2); float dot1 = smoothstep(.27*r, .2*r, d); float rim = smoothstep(.34*r, .28*r, d) - dot1; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.95,.74,.84), dot1*step(.04, vTU.y)); diffuseColor.rgb *= 1. - rim*.45*step(.04, vTU.y); }');
+      sh.vertexShader = 'uniform float uT;\nattribute vec2 aTU;\nvarying vec2 vTU;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vTU = aTU; float kk = clamp(position.y / ' + H.toFixed(2) + ', 0., 1.); float bb = kk*kk; float sw = sin(uT*.85 + ' + ph.toFixed(2) + ' + kk*2.6); transformed.x += sw*bb*1.6 + bb*kk*1.9; transformed.z += cos(uT*.6 + ' + ph.toFixed(2) + ' + kk*2.1)*bb*0.9; transformed.y -= bb*kk*1.5;'); };
     const mesh = new THREE.Mesh(geo, m); mesh.castShadow = true; mesh.frustumCulled = false;
     const a = k / 5 * Math.PI * 2 + 0.4, r = 1.8 + (k % 2) * 1.2, ring = new THREE.Mesh(new THREE.RingGeometry(0.75, 1.2, 32).rotateX(-Math.PI / 2), foamMat);
     const g = new THREE.Group(); g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); g.rotation.y = -a; g.add(mesh); ring.position.y = 0.06; g.add(ring); krak.add(g);
@@ -642,11 +645,14 @@ export function createScene(canvas, data, opts) {
     const ma = MA + Math.sin(t * 0.045) * 0.55;   // lua/sol passeando: sombras e feixes se movem devagar
     if (TOD.day > 0) { const sa = Math.PI * (TOD.h - 6) / 12.5; moon.position.set(Math.cos(sa) * -80 + Math.sin(t * 0.045) * 6, 25 + TOD.day * 70, -30 + Math.sin(t * 0.03) * 6); }
     else moon.position.set(Math.cos(ma) * MR, MOON0.y + Math.sin(t * 0.03) * 8, Math.sin(ma) * MR);
-    trMat.uniforms.uT.value = t; bowMat.uniforms.uT.value = t;
+    trMat.uniforms.uT.value = t;
     FINS.forEach((F) => { const c = F.isl >= 0 ? islands[F.isl].grp.position : { x: -15, z: 2 }, a = t * F.sp + F.ph;
       const x = c.x + Math.cos(a) * F.rad, z = c.z + Math.sin(a) * F.rad, dir = Math.sign(F.sp), hx = -Math.sin(a) * dir, hz = Math.cos(a) * dir;
+      const lt = (t + F.ph * 3.1) % F.cyc, up = lt < 2.8 ? lt / 2.8 : lt < 14 ? 1 : lt < 16.8 ? 1 - (lt - 14) / 2.8 : 0, e = up * up * (3 - 2 * up);   // emerge, nada, submerge
+      F.f.position.y = -1.75 * (1 - e); F.f.rotation.z = (1 - e) * (lt < 8 ? -0.35 : 0.35);
       F.g.position.set(x, Math.sin(t * 2.1 + F.ph) * 0.04 - 0.08, z); F.g.rotation.y = Math.atan2(hz, -hx) + Math.sin(t * 1.6 + F.ph) * 0.06;
-      if (t - F.last > 0.07) { F.last = t; trailPush(x, z, hx, hz, t); } });
+      F.bm.uniforms.uT.value = t; F.bm.uniforms.uK.value = e; F.g.visible = e > 0.002;
+      if (e > 0.03 && t - F.last > 0.07) { F.last = t; trailPush(x, z, hx, hz, t, e); } });
     { const cyc = Math.floor(t / KCYC), lt = t - cyc * KCYC;
       if (cyc !== kCycle && KSPOTS.length) { kCycle = cyc; let n = Math.floor(Math.abs(Math.sin(cyc * 12.9898) * 43758.5453)) % KSPOTS.length; if (n === kSpot) n = (n + 1) % KSPOTS.length; kSpot = n; krak.position.set(KSPOTS[n][0], 0, KSPOTS[n][1]); krak.rotation.y = cyc * 1.7; }
       tent.forEach((T, k) => { T.u.value = t; const tt = lt - T.delay; const up = tt < 0 ? 0 : tt < 2.6 ? tt / 2.6 : tt < 11 ? 1 : tt < 13.6 ? 1 - (tt - 11) / 2.6 : 0, e = up * up * (3 - 2 * up);

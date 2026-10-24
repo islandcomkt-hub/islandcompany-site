@@ -190,12 +190,12 @@
       var s = tr.height / sr.height, dx = (tr.left + tr.width / 2) - (sr.left + sr.width / 2), dy = (tr.top + tr.height / 2) - (sr.top + sr.height / 2);
       var P = function (k, extra, kk) { var q = kk == null ? k : kk; return T(dx * k, dy * q, 1 + (s - 1) * k, extra); };
       var kf, opt = { duration: 900, easing: EZ, fill: 'forwards' }, list = [];
-      if (back) { var c0 = clone(b, sr); var a0 = c0.animate([{ transform: 'none', opacity: 1 }, { transform: P(1), opacity: 1 }], { duration: 520, easing: EZ, fill: 'forwards' }); return done(a0).then(function () { c0.remove(); }); }
+      if (back) opt.direction = 'reverse';
       if (fx === 'segmentacao') {
         var cuts = ['inset(0 0 66% 0)', 'inset(33% 0 33% 0)', 'inset(66% 0 0 0)'], offs = [-60, 50, -40];
         cuts.forEach(function (cl, i) {
           var c = clone(b, sr, cl);
-          list.push(done(c.animate([{ transform: 'none' }, { transform: P(.45, 'translateX(' + offs[i] + 'px) rotate(' + (offs[i] / 6) + 'deg)'), offset: .5 }, { transform: P(1) }], { duration: 900, delay: i * 70, easing: EZ, fill: 'forwards' })).then(function () { c.remove(); }));
+          list.push(done(c.animate([{ transform: 'none' }, { transform: P(.45, 'translateX(' + offs[i] + 'px) rotate(' + (offs[i] / 6) + 'deg)'), offset: .5 }, { transform: P(1) }], { duration: 900, delay: back ? (2 - i) * 70 : i * 70, easing: EZ, fill: 'both', direction: back ? 'reverse' : 'normal' })).then(function () { c.remove(); }));
         });
         return Promise.all(list);
       }
@@ -203,7 +203,7 @@
       switch (fx) {
         case 'imersao': kf = [{ transform: 'none', opacity: 1 }, { transform: P(.15, 'scaleY(.85)', .45), opacity: .9, offset: .25 }, { transform: P(.5, '', 1.25), opacity: .15, offset: .55 }, { transform: P(.85, '', 1.05), opacity: .9, offset: .8 }, { transform: P(1), opacity: 1 }]; opt.duration = 1000; break;
         case 'lapidacao': kf = [{ transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' }, { transform: P(.3, 'rotateY(180deg)'), clipPath: 'polygon(20% 0,100% 15%,85% 100%,0 80%)', offset: .3 }, { transform: P(.6, 'rotateY(300deg)'), clipPath: 'polygon(10% 10%,90% 0,100% 90%,15% 100%)', offset: .6 }, { transform: P(1, 'rotateY(360deg)'), clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' }]; opt.duration = 1000; break;
-        case 'ativacao': kf = [{ transform: 'none', opacity: 1, textShadow: 'none' }, { opacity: .15, offset: .1 }, { opacity: 1, textShadow: '0 0 30px #FFB36B', offset: .18 }, { opacity: .2, offset: .26 }, { opacity: 1, textShadow: '0 0 40px #FF9A45', transform: 'scale(1.12)', offset: .4 }, { transform: P(1), opacity: 1, textShadow: '0 0 24px rgba(255,140,60,.8)' }]; opt.duration = 950; break;
+        case 'ativacao': kf = [{ transform: 'none', opacity: 1, textShadow: 'none' }, { opacity: .15, offset: .1 }, { opacity: 1, textShadow: '0 0 30px #5CFF9D', offset: .18 }, { opacity: .2, offset: .26 }, { opacity: 1, textShadow: '0 0 40px #00E06A', transform: 'scale(1.12)', offset: .4 }, { transform: P(1), opacity: 1, textShadow: '0 0 24px rgba(0,200,90,.8)' }]; opt.duration = 950; break;
         case 'navegacao': kf = [{ transform: 'none' }, { transform: P(.2, 'rotate(10deg)', .1), offset: .2 }, { transform: P(.4, 'rotate(-9deg)', .45), offset: .4 }, { transform: P(.6, 'rotate(8deg)', .55), offset: .6 }, { transform: P(.8, 'rotate(-6deg)', .9), offset: .8 }, { transform: P(1) }]; opt.duration = 1100; opt.easing = 'cubic-bezier(.45,0,.55,1)'; break;
         default: kf = [{ transform: 'none' }, { transform: P(.5, 'scale(.35)'), offset: .35 }, { transform: P(.75, 'scale(.7)'), offset: .55 }, { transform: P(.9, 'scale(1.1)'), offset: .78 }, { transform: P(1) }]; opt.duration = 1000; opt.easing = 'cubic-bezier(.4,0,.2,1)';
       }
@@ -227,9 +227,8 @@
       rest.forEach(function (e) { ps.push(done(e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }))); });
       chars.slice(1).forEach(function (c, i, arr) { var off = c.getBoundingClientRect().left - x0; ps.push(done(c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + (-off) + 'px)', opacity: 0 }], { duration: 320, delay: (arr.length - i) * 15, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' }))); });
       return Promise.all(ps).then(function () {
-        var fr = chars[0].getBoundingClientRect(); chars[0].style.opacity = 0;
-        var tr = ob.getBoundingClientRect();
-        return fly(ob, '', fr, tr, true);
+        var fr = chars[0].getBoundingClientRect(), br = ob.getBoundingClientRect();
+        var pr = fly(ob, ob.getAttribute('data-fx'), br, fr, true); chars[0].style.opacity = 0; return pr;
       }).then(function () { ob.classList.remove('away', 'on'); stage.innerHTML = ''; });
     }
     function pick(k) {
