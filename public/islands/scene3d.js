@@ -302,10 +302,10 @@ void main(){
   float fN = fb(p*1.6 + vec2(t*.35,-t*.25)), rN = fb(p*.45);
   for(int i=0;i<6;i++){
     vec2 d = p - uIsl[i].xy; float dist = length(d), th = atan(d.y, d.x), w = rr(th, uIsl[i].z, uIsl[i].w)*1.02, r = dist - w;
-    float boost = 1. + uBoost[i]*1.6;
+    float boost = .28 + uBoost[i]*2.1;
     float sh = smoothstep(11., 0., r);
     col += uAcc[i]*(sh*.10 + sh*sh*.22)*boost*step(-.4, r);
-    col += vec3(.04,.30,.36)*smoothstep(4.5,0.,r)*.30*step(-.4,r);
+    col += vec3(.04,.30,.36)*smoothstep(4.5,0.,r)*(.12 + uBoost[i]*.22)*step(-.4,r);
     float f = (1.-smoothstep(0.,1.4,r)) * step(-.5, r) * (.5 + .5*fN);
     f *= .62 + .38*sin(t*1.2 + dist*1.3);
     col += vec3(.80,.88,1.)*f*.45;
@@ -322,7 +322,7 @@ void main(){
 export function createScene(canvas, data, opts) {
   opts = opts || {};
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.32;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.32;
   const FOGC = new THREE.Color('#1c0c3c'); renderer.setClearColor(FOGC, 1);
   const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x1c0c3c, 0.0042);
   const camera = new THREE.PerspectiveCamera(FOV, 1.6, 1, 900);
@@ -335,8 +335,12 @@ export function createScene(canvas, data, opts) {
   const winMat = new THREE.MeshStandardMaterial({ color: '#13203a', roughness: 0.4, metalness: 0.4, emissive: '#ffffff', emissiveMap: winTex('#82abff', 6, 14, 0.55), emissiveIntensity: 1.7 });
 
   /* luzes */
-  scene.add(new THREE.HemisphereLight(0xc9b8ff, 0x5a3f8c, 1.9));
-  const moon = new THREE.DirectionalLight(0xffd9ae, 3.4); moon.position.set(-40, 70, -30); scene.add(moon);
+  scene.add(new THREE.HemisphereLight(0xc9b8ff, 0x5a3f8c, 1.55));
+  const moon = new THREE.DirectionalLight(0xffd9ae, 4.1); moon.position.set(-40, 70, -30); scene.add(moon); scene.add(moon.target);
+  const SM = (window.innerWidth || 1200) < 720 ? 1024 : 2048;
+  moon.castShadow = true; moon.shadow.mapSize.set(SM, SM); moon.shadow.bias = -0.0006; moon.shadow.normalBias = 0.06; moon.shadow.radius = 3;
+  Object.assign(moon.shadow.camera, { left: -75, right: 75, top: 75, bottom: -75, near: 1, far: 260 }); moon.shadow.camera.updateProjectionMatrix();
+  const MOON0 = new THREE.Vector3(-40, 70, -30), MR = Math.hypot(MOON0.x, MOON0.z), MA = Math.atan2(MOON0.z, MOON0.x);
   const rim = new THREE.DirectionalLight(0x6fe8d6, 1.0); rim.position.set(50, 20, 60); scene.add(rim);
   const fill = new THREE.DirectionalLight(0xffb1d0, 0.9); fill.position.set(10, 30, 80); scene.add(fill);
   const accentLight = new THREE.PointLight(0xffffff, 0, 60, 1.2); scene.add(accentLight);
@@ -384,6 +388,7 @@ export function createScene(canvas, data, opts) {
       const beam = new THREE.Mesh(new THREE.ConeGeometry(3.4, 26, 24, 1, true).translate(0, -12, 0).rotateZ(Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0.055, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
       const piv = new THREE.Group(); piv.position.set(-2.6, P + 10.0, -3.2); piv.add(beam); beam.position.x = 0; grp.add(piv); isl.extras.beam = piv;
     }
+    grp.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(grp); islands.push(isl);
   });
 
@@ -397,7 +402,20 @@ export function createScene(canvas, data, opts) {
   const fireflies = new THREE.Points(ffG, ffMat); fireflies.frustumCulled = false; fireflies.position.y = 0.5; scene.add(fireflies);
 
   /* barco + rastro */
-  const boat = makeBoat(); scene.add(boat.group);
+  const boat = makeBoat(); scene.add(boat.group); boat.group.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
+  /* sombra projetada sobre o mar (o shader da água não recebe sombra) */
+  const shadowSea = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ color: 0x05020c, opacity: 0.5, depthWrite: false }));
+  shadowSea.position.y = 0.03; shadowSea.receiveShadow = true; scene.add(shadowSea);
+  /* feixes de luz volumétricos sobre cada ilha (god rays) */
+  const shaftMat = (c) => new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+    uniforms: { uTime: { value: 0 }, uK: { value: 0 }, uC: { value: new THREE.Color(c) }, uSeed: { value: Math.random() * 10 } },
+    vertexShader: 'varying vec2 vU; varying vec3 vN; varying vec3 vV; void main(){ vU = uv; vec4 w = modelMatrix*vec4(position,1.); vN = normalize(mat3(modelMatrix)*normal); vV = normalize(cameraPosition - w.xyz); gl_Position = projectionMatrix*viewMatrix*w; }',
+    fragmentShader: 'uniform float uTime; uniform float uK; uniform vec3 uC; uniform float uSeed; varying vec2 vU; varying vec3 vN; varying vec3 vV; void main(){ float e = abs(dot(vN, vV)); float edge = mix(.5, 1., e); float h = vU.y; float fall = smoothstep(0., .12, h) * pow(1.-h, 1.25); float st = .65 + .35*sin(vU.x*37.7 + uTime*.35 + uSeed) * sin(vU.x*13. - uTime*.22 + uSeed*2.); float a = edge*fall*st*(.07 + uK*.16); gl_FragColor = vec4(uC, a); }' });
+  const shafts = islands.map((is, i) => {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(is.R * 0.5, is.R * 1.12, 46, 40, 1, true).translate(0, -23, 0), shaftMat(i === 0 ? '#ffe2c4' : '#d9ccff'));
+    m.userData.c = new THREE.Color('#d9ccff'); m.renderOrder = 5; m.frustumCulled = false; scene.add(m); return m;
+  });
+  const _up = new THREE.Vector3(0, 1, 0), _md = new THREE.Vector3();
   const WAKE_N = 72, wakeGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), age = new Float32Array(WAKE_N).fill(1);
   wakeGeo.setAttribute('aAge', new THREE.InstancedBufferAttribute(age, 1));
   const wakeMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, vertexShader: 'attribute float aAge; varying float vA; varying vec2 vU; void main(){ vA=aAge; vU=uv; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position,1.0);} ', fragmentShader: 'varying float vA; varying vec2 vU; void main(){ float r=length((vU-.5)*2.); float a=smoothstep(1.,.15,r)*.5*pow(max(1.-vA,0.),1.5); gl_FragColor=vec4(.86,.92,1.,a); }' });
@@ -529,7 +547,11 @@ export function createScene(canvas, data, opts) {
   };
   api.render = function (ms) {
     const t = ms / 1000; time = t; waterMat.uniforms.uTime.value = t; windU.value = t; ffMat.uniforms.uTime.value = t;
-    for (let i = 0; i < N; i++) { const target = (hover === i || focused === i) ? 1 : 0; uBoost[i] += (target - uBoost[i]) * 0.12; }
+    for (let i = 0; i < N; i++) { const target = focused === i ? 1 : 0; uBoost[i] += (target - uBoost[i]) * 0.05; }
+    const ma = MA + Math.sin(t * 0.045) * 0.55;   // lua passeando: sombras e feixes se movem devagar
+    moon.position.set(Math.cos(ma) * MR, MOON0.y + Math.sin(t * 0.03) * 8, Math.sin(ma) * MR); waterMat.uniforms.uMoon.value.copy(moon.position).normalize();
+    _md.copy(moon.position).normalize();
+    shafts.forEach((m, i) => { const c = islands[i].grp.position; m.quaternion.setFromUnitVectors(_up, _md); m.position.set(c.x, P + 0.2, c.z).addScaledVector(_md, 46); const u = m.material.uniforms; u.uTime.value = t; u.uK.value = uBoost[i]; u.uC.value.copy(m.userData.c).lerp(accents[i], uBoost[i] * 0.6); });
     const tk = focused >= 0 ? 1 : 0; accentK += (tk - accentK) * 0.08;
     if (focused >= 0) { const is = islands[focused], c = is.grp.position; accentLight.color.copy(accents[focused]); accentLight.position.set(c.x + is.u[0] * 4, 9, c.z + is.u[1] * 4); }
     accentLight.intensity = accentK * 70;

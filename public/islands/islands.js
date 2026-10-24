@@ -215,7 +215,7 @@
       panel.parentNode.insertBefore(ghost, panel.nextSibling);
       panel.style.visibility = 'hidden'; panel.inert = true;
     } else closePanel();
-    dimFor(toFocus ? target : -1); sc.setFocus(toFocus ? target : -1);
+    dimFor(toFocus ? target : -1); sc.setFocus(-1);
 
     var c0 = cam, c1 = toFocus ? camFocus(target) : camOverview(), ho0 = curHO, ho1 = hoFor(toFocus ? target : -1);
     var T = RM.matches ? 0 : (travelBoat ? 2500 : (toFocus ? 1200 : 1050));
@@ -244,7 +244,7 @@
       applyCam(c1, ho1); sc.clearWake(); renderNow();
       cur = toFocus ? target : -1; dest = -2;
       if (toFocus) {
-        if (!preRendered) renderPanel(target); panel.style.visibility = ''; setState('focused'); openPanel();
+        if (!preRendered) renderPanel(target); panel.style.visibility = ''; setState('focused'); sc.setFocus(target); openPanel();
         if (act === 'prev' || act === 'next' || act === 'all') { var b = panel.querySelector('[data-act="' + act + '"]'); if (b) b.focus({ preventScroll: true }); }
         else if (act === 'h' || from === -1) { var h = panel.querySelector('#isl-h'); if (h) h.focus({ preventScroll: true }); }
         if (act) live.textContent = D.islands[target].name + ', ilha ' + (target + 1) + ' de ' + N;
@@ -299,7 +299,7 @@
     measure();
     if (!sc) return;
     sc.clearWake(); sc.layout(mobile); sizeCanvas();
-    if (busy) { cur = endIdx; dest = -2; if (endIdx >= 0) { boatAt = endIdx; boatSide = boatSide; } setState(endIdx >= 0 ? 'focused' : 'overview'); if (endIdx >= 0) { renderPanel(endIdx); panel.style.visibility = ''; openPanel(); dimFor(endIdx); } else { dimFor(-1); } sc.setFocus(endIdx); }
+    if (busy) { cur = endIdx; dest = -2; if (endIdx >= 0) { boatAt = endIdx; boatSide = boatSide; } setState(endIdx >= 0 ? 'focused' : 'overview'); sc.setFocus(endIdx >= 0 ? endIdx : -1); if (endIdx >= 0) { renderPanel(endIdx); panel.style.visibility = ''; openPanel(); dimFor(endIdx); } else { dimFor(-1); } sc.setFocus(endIdx); }
     boatRy = sc.dockBoat(boatAt, boatSide);
     applyCam(cur >= 0 ? camFocus(cur) : introCam(camOverview(), enterK), hoFor(cur));
     if (cur >= 0) { panel.inert = false; panel.dataset.open = 'true'; }
