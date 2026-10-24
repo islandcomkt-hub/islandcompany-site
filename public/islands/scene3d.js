@@ -652,7 +652,7 @@ export function createScene(canvas, data, opts) {
   const monster = new THREE.Mesh(new THREE.PlaneGeometry(47, 83).rotateX(-Math.PI / 2), monMat); monster.visible = false;
   const monFrame = (i, v) => v.set((i % MCOLS) / MCOLS, 1 - (Math.floor(i / MCOLS) + 1) / MROWS);
   // passa só duas vezes por dia: um horário sorteado de manhã cedo e outro no fim da tarde (sorteio fixo por dia)
-  const MON_DUR = 95, MON_FORCE = /[?&]monstro/.test(location.search);
+  const MON_DUR = 38, MON_FORCE = /[?&]monstro/.test(location.search);
   function monSlots() { const d = new Date(), seed = d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate(); return [6 * 3600 + hrand(seed) * 2.5 * 3600, 16.5 * 3600 + hrand(seed + 0.37) * 1.5 * 3600]; }
   monster.position.y = 0.045; monster.renderOrder = 1; scene.add(monster);
 
@@ -691,7 +691,7 @@ export function createScene(canvas, data, opts) {
       if (monster.visible) {   // de baixo à esquerda (perto da câmera) até o topo à direita, na diagonal
         const ax = -95, az = 85, bx = 95, bz = -95, x = ax + (bx - ax) * pr, z = az + (bz - az) * pr + Math.sin(pr * 6.28) * 6;
         const dx = bx - ax, dz = (bz - az) + Math.cos(pr * 6.28) * 6 * 6.28; monster.position.x = x; monster.position.z = z; monster.rotation.y = Math.atan2(-dx, -dz);
-        const ft = t * 16.7, f0 = Math.floor(ft) % MFR; monFrame(f0, monMat.uniforms.uF0.value); monFrame((f0 + 1) % MFR, monMat.uniforms.uF1.value); monMat.uniforms.uMix.value = ft - Math.floor(ft);
+        const ft = t * 22, f0 = Math.floor(ft) % MFR; monFrame(f0, monMat.uniforms.uF0.value); monFrame((f0 + 1) % MFR, monMat.uniforms.uF1.value); monMat.uniforms.uMix.value = ft - Math.floor(ft);
         monMat.uniforms.uOp.value = 0.13 * Math.min(1, pr * 8, (1 - pr) * 8);
       } } waterMat.uniforms.uMoon.value.copy(moon.position).normalize();
     _md.copy(moon.position).normalize();
