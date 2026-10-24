@@ -587,37 +587,21 @@ export function createScene(canvas, data, opts) {
   const finShape = new THREE.Shape(); finShape.moveTo(-1.0, 0); finShape.bezierCurveTo(-0.55, 0.35, -0.05, 1.05, 0.55, 1.7); finShape.bezierCurveTo(0.42, 1.2, 0.38, 0.55, 0.9, 0); finShape.lineTo(-1.0, 0);
   const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.13, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.07, bevelSegments: 4, curveSegments: 24 }).translate(0, -0.2, -0.065);
   { const fp = finGeo.attributes.position; for (let q = 0; q < fp.count; q++) { const y = fp.getY(q), k = clamp(y / 1.5, 0, 1); fp.setZ(q, fp.getZ(q) * (1 - 0.75 * k)); } finGeo.computeVertexNormals(); }   // afina para a ponta
-  // rastro: faixa contínua que segue o caminho da barbatana, abre em V e some com a idade
-  const RN = 40, RDT = 0.055;
-  const ribMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uC: waterMat.uniforms.uFoamC },
-    vertexShader: 'attribute float aA; attribute float aS; attribute float aK; varying float vA; varying float vS; varying float vK; void main(){ vA = aA; vS = aS; vK = aK; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-    fragmentShader: 'uniform float uT; uniform vec3 uC; varying float vA; varying float vS; varying float vK; void main(){ float s = abs(vS); float edge = smoothstep(.45,.9,s)*(1.-smoothstep(.9,1.,s)); float core = (1.-s)*.35*(1.-smoothstep(0.,.35,vA)); float n = .78 + .22*sin(vA*46. - uT*5. + vS*2.); float life = pow(1.-vA, 1.4)*smoothstep(0.,.04,vA); float a = (edge*.9 + core)*n*life*vK; if(a<.004) discard; gl_FragColor = vec4(mix(uC, vec3(1.), .5), min(1., a*1.05)); }' });
-  function makeRibbon() {
-    const g = new THREE.BufferGeometry(), pos = new Float32Array(RN * 2 * 3), aA = new Float32Array(RN * 2), aS = new Float32Array(RN * 2), aK = new Float32Array(RN * 2), idx = [];
-    for (let i = 0; i < RN; i++) { aS[i * 2] = -1; aS[i * 2 + 1] = 1; if (i < RN - 1) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
-    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.BufferAttribute(aA, 1)); g.setAttribute('aS', new THREE.BufferAttribute(aS, 1)); g.setAttribute('aK', new THREE.BufferAttribute(aK, 1)); g.setIndex(idx);
-    const m = new THREE.Mesh(g, ribMat); m.frustumCulled = false; m.position.y = 0.07; m.renderOrder = 3; scene.add(m);
-    return { m, g, hx: new Float32Array(RN), hz: new Float32Array(RN), ht: new Float32Array(RN).fill(-99), hk: new Float32Array(RN), last: -1 };
-  }
-  function ribbonUpdate(R, x, z, k, t) {
-    if (t - R.last >= RDT) { R.last = t; R.hx.copyWithin(1, 0); R.hz.copyWithin(1, 0); R.ht.copyWithin(1, 0); R.hk.copyWithin(1, 0); }
-    R.hx[0] = x; R.hz[0] = z; R.ht[0] = t; R.hk[0] = k;
-    const P = R.g.attributes.position.array, A = R.g.attributes.aA.array, K = R.g.attributes.aK.array;
-    for (let i = 0; i < RN; i++) {
-      const j0 = Math.max(0, i - 1), j1 = Math.min(RN - 1, i + 1); let tx = R.hx[j0] - R.hx[j1], tz = R.hz[j0] - R.hz[j1]; const tl = Math.hypot(tx, tz) || 1; tx /= tl; tz /= tl;
-      const age = clamp((t - R.ht[i]) / (RN * RDT), 0, 1), w = 0.18 + age * 2.6, nx = -tz * w, nz = tx * w;
-      P[i * 6] = R.hx[i] + nx; P[i * 6 + 1] = 0; P[i * 6 + 2] = R.hz[i] + nz; P[i * 6 + 3] = R.hx[i] - nx; P[i * 6 + 4] = 0; P[i * 6 + 5] = R.hz[i] - nz;
-      A[i * 2] = A[i * 2 + 1] = R.ht[i] < -50 ? 1 : age; K[i * 2] = K[i * 2 + 1] = R.hk[i];
-    }
-    R.g.attributes.position.needsUpdate = true; R.g.attributes.aA.needsUpdate = true; R.g.attributes.aK.needsUpdate = true;
-  }
+  // rastro de espuma: partículas que nascem atrás da barbatana e se abrem em V
+  const TR = 150, trG = new THREE.BufferGeometry(), trB = new Float32Array(TR * 3), trD = new Float32Array(TR * 4), trS = new Float32Array(TR);
+  trG.setAttribute('position', new THREE.BufferAttribute(trB, 3)); trG.setAttribute('aD', new THREE.BufferAttribute(trD, 4)); trG.setAttribute('aS', new THREE.BufferAttribute(trS, 1));
+  const trMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uPx: ffMat.uniforms.uPx, uC: waterMat.uniforms.uFoamC },
+    vertexShader: 'attribute vec4 aD; attribute float aS; uniform float uT; uniform float uPx; varying float vA; void main(){ float a = clamp((uT - aD.w)/2.4, 0., 1.); vec3 p = position + vec3(aD.x, 0., aD.y)*aD.z*a*1.6; vA = (1.-a)*aS*step(aD.w, uT)*step(.0001, aD.w); vec4 mv = modelViewMatrix*vec4(p,1.); gl_PointSize = (2.6 + a*7.)*uPx*520./-mv.z; gl_Position = projectionMatrix*mv; }',
+    fragmentShader: 'uniform vec3 uC; varying float vA; void main(){ vec2 d = gl_PointCoord-.5; float r = length(d)*2.; float ring = pow(smoothstep(1.,.1,r), 1.4)*(.75 + .25*smoothstep(.2,.7,r)); float a = ring*vA*.42; if(a<.01) discard; gl_FragColor = vec4(mix(uC, vec3(1.), .4), a); }' });
+  const trail = new THREE.Points(trG, trMat); trail.frustumCulled = false; trail.position.y = 0.06; trail.renderOrder = 3; scene.add(trail); let trI = 0;
+  function trailPush(x, z, hx, hz, t, k) { for (const sd of [-1, 1]) { const j = trI++ % TR; trB[j * 3] = x - hx * 0.9; trB[j * 3 + 1] = 0; trB[j * 3 + 2] = z - hz * 0.9; trD[j * 4] = -hz * sd; trD[j * 4 + 1] = hx * sd; trD[j * 4 + 2] = 0.7 + Math.random() * 0.5; trD[j * 4 + 3] = t; trS[j] = k; } trG.attributes.position.needsUpdate = true; trG.attributes.aD.needsUpdate = true; trG.attributes.aS.needsUpdate = true; }
   const bowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: { value: 0 }, uK: { value: 1 }, uC: waterMat.uniforms.uFoamC },
     vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-    fragmentShader: 'uniform float uT; uniform float uK; uniform vec3 uC; varying vec2 vU; void main(){ vec2 p = (vU-.5)*2.; float v = abs(p.y) - (p.x+1.)*.45; float line = smoothstep(.3,.0,abs(v))*smoothstep(1.,.2,p.x)*smoothstep(-1.,-.6,p.x); float n = .7+.3*sin(p.x*18.-uT*7.); gl_FragColor = vec4(mix(uC,vec3(1.),.5), line*n*.75*uK); }' });
+    fragmentShader: 'uniform float uT; uniform float uK; uniform vec3 uC; varying vec2 vU; void main(){ vec2 p = (vU-.5)*2.; float v = abs(p.y) - (p.x+1.)*.45; float line = smoothstep(.34,.02,abs(v))*smoothstep(1.,.2,p.x)*smoothstep(-1.,-.6,p.x); float n = .9 + .1*sin(p.x*5. - uT*2.2); float k = smoothstep(.15, .9, uK); gl_FragColor = vec4(mix(uC,vec3(1.),.5), line*n*.6*k); }' });
   const FINS = [[3, 17.5, 0.13, 0], [5, 17, -0.11, 2], [-1, 9, 0.14, 4]].map(([isl, rad, sp, ph]) => {
     const g = new THREE.Group(), f = new THREE.Mesh(finGeo, darkSkin); f.castShadow = true; g.add(f);
     const bm = bowMat.clone(); bm.uniforms.uC = waterMat.uniforms.uFoamC; const bow = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.2).rotateX(-Math.PI / 2), bm); bow.position.set(0.15, 0.05, 0); bow.renderOrder = 3; g.add(bow);
-    g.scale.setScalar(1.9); scene.add(g); return { g, f, bm, isl, rad, sp, ph, rib: makeRibbon(), cyc: 20 + ph * 1.3 };
+    g.scale.setScalar(1.9); scene.add(g); return { g, f, bm, isl, rad, sp, ph, last: 0, cyc: 20 + ph * 1.3 };
   });
   const foamMat = new THREE.MeshBasicMaterial({ color: '#cfd8ff', transparent: true, opacity: 0.22, depthWrite: false, fog: false });
   // kraken: tentáculos em mar aberto, somem e reaparecem em outro ponto
@@ -661,14 +645,14 @@ export function createScene(canvas, data, opts) {
     const ma = MA + Math.sin(t * 0.045) * 0.55;   // lua/sol passeando: sombras e feixes se movem devagar
     if (TOD.day > 0) { const sa = Math.PI * (TOD.h - 6) / 12.5; moon.position.set(Math.cos(sa) * -80 + Math.sin(t * 0.045) * 6, 25 + TOD.day * 70, -30 + Math.sin(t * 0.03) * 6); }
     else moon.position.set(Math.cos(ma) * MR, MOON0.y + Math.sin(t * 0.03) * 8, Math.sin(ma) * MR);
-    ribMat.uniforms.uT.value = t;
+    trMat.uniforms.uT.value = t;
     FINS.forEach((F) => { const c = F.isl >= 0 ? islands[F.isl].grp.position : { x: -15, z: 2 }, a = t * F.sp + F.ph;
       const x = c.x + Math.cos(a) * F.rad, z = c.z + Math.sin(a) * F.rad, dir = Math.sign(F.sp), hx = -Math.sin(a) * dir, hz = Math.cos(a) * dir;
       const lt = (t + F.ph * 3.1) % F.cyc, up = lt < 2.8 ? lt / 2.8 : lt < 14 ? 1 : lt < 16.8 ? 1 - (lt - 14) / 2.8 : 0, e = up * up * (3 - 2 * up);   // emerge, nada, submerge
-      F.f.position.y = -1.75 * (1 - e); F.f.rotation.z = (1 - e) * (lt < 8 ? -0.35 : 0.35);
-      F.g.position.set(x, Math.sin(t * 2.1 + F.ph) * 0.04 - 0.08, z); F.g.rotation.y = Math.atan2(hz, -hx) + Math.sin(t * 1.6 + F.ph) * 0.06;
+      F.f.position.y = -1.75 * (1 - e) + Math.sin(t * 2.1 + F.ph) * 0.02 - 0.04; F.f.rotation.z = (1 - e) * (lt < 8 ? -0.35 : 0.35);
+      F.g.position.set(x, 0, z);   // grupo fixo na linha d'água: a onda da frente não afunda e pisca F.g.rotation.y = Math.atan2(hz, -hx) + Math.sin(t * 1.6 + F.ph) * 0.06;
       F.bm.uniforms.uT.value = t; F.bm.uniforms.uK.value = e; F.g.visible = e > 0.002;
-      ribbonUpdate(F.rib, x - hx * 1.6, z - hz * 1.6, e, t); });
+      if (e > 0.03 && t - F.last > 0.07) { F.last = t; trailPush(x, z, hx, hz, t, e); } });
     { const cyc = Math.floor(t / KCYC), lt = t - cyc * KCYC;
       if (cyc !== kCycle && KSPOTS.length) { kCycle = cyc; let n = Math.floor(Math.abs(Math.sin(cyc * 12.9898) * 43758.5453)) % KSPOTS.length; if (n === kSpot) n = (n + 1) % KSPOTS.length; kSpot = n; krak.position.set(KSPOTS[n][0], 0, KSPOTS[n][1]); krak.rotation.y = cyc * 1.7; }
       tent.forEach((T, k) => { T.u.value = t; const tt = lt - T.delay; const up = tt < 0 ? 0 : tt < 2.6 ? tt / 2.6 : tt < 11 ? 1 : tt < 13.6 ? 1 - (tt - 11) / 2.6 : 0, e = up * up * (3 - 2 * up);

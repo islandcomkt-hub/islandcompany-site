@@ -116,6 +116,23 @@
     if (row) row.style.perspective = '900px';
   })();
 
+  /* título do card final: as letras se afastam de leve no hover */
+  (function () {
+    var h = document.getElementById('t8'); if (!h) return;
+    var txt = h.textContent; h.setAttribute('aria-label', txt);
+    h.innerHTML = txt.split(' ').map(function (w) { return '<span class="sp-w" aria-hidden="true">' + w.split('').map(function (c) { return '<span class="sp-c">' + c + '</span>'; }).join('') + '</span>'; }).join(' ');
+    var cs = [].slice.call(h.querySelectorAll('.sp-c'));
+    function spread(on) {
+      if (!on) { cs.forEach(function (c) { c.style.transform = ''; }); return; }
+      var lines = new Map();
+      cs.forEach(function (c) { var t = c.offsetTop; if (!lines.has(t)) lines.set(t, []); lines.get(t).push(c); });
+      lines.forEach(function (arr) { var a = arr[0].offsetLeft, b = arr[arr.length - 1].offsetLeft + arr[arr.length - 1].offsetWidth, mid = (a + b) / 2, half = Math.max(1, (b - a) / 2), k = Math.min(18, half * 0.05);
+        arr.forEach(function (c) { var x = c.offsetLeft + c.offsetWidth / 2; c.style.transform = 'translateX(' + ((x - mid) / half * k).toFixed(2) + 'px)'; }); });
+    }
+    h.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') spread(true); });
+    h.addEventListener('pointerleave', function () { spread(false); });
+  })();
+
   /* adesivos do final: seguem o mouse de leve e dá pra arrastar */
   (function () {
     var sec = document.querySelector('.fin2'); if (!sec || RM) return;
