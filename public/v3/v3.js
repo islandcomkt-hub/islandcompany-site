@@ -7,9 +7,20 @@
   if ('IntersectionObserver' in window && !RM) {
     root.classList.add('v3-motion');
     var blocks = [].slice.call(document.querySelectorAll('.blk'));
+    // cores originais das seções (lidas antes do estado de entrada sobrescrever o fundo)
+    [].slice.call(document.querySelectorAll('main > section, body > section')).forEach(function (sec) {
+      var had = sec.classList.contains('blk-done'); sec.classList.add('blk-done');
+      var cs = getComputedStyle(sec), img = cs.backgroundImage;
+      if (cs.backgroundColor !== 'rgba(0, 0, 0, 0)' || (img && img !== 'none')) { sec.__bg = cs.backgroundColor; sec.__bgFull = (img && img !== 'none' ? img + ', ' : '') + cs.backgroundColor; }
+      if (!had) sec.classList.remove('blk-done');
+    });
     blocks.forEach(function (b) {
       if (b.getBoundingClientRect().top < innerHeight * 0.9) { b.classList.add('blk-on', 'blk-done'); return; }
       b.addEventListener('transitionend', function (e) { if (e.target === b && e.propertyName === 'clip-path') b.classList.add('blk-done'); });
+      // a seção abre com a própria cor (topo arredondado) por cima da cor da seção anterior, sem faixa branca nas laterais
+      var prev = b.previousElementSibling;
+      while (prev && !prev.__bg) prev = prev.previousElementSibling;
+      b.style.setProperty('--self', b.__bgFull); b.style.setProperty('--under', prev ? prev.__bg : b.__bg);
     });
     var bo = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('blk-on'); bo.unobserve(e.target); setTimeout(function () { e.target.classList.add('blk-done'); }, 1400); } });
@@ -288,26 +299,53 @@
   (function () {
     var box = document.getElementById('tm-rows'); if (!box) return;
     var T = [
-      ['Marina A.', 'f1', 'Landing page', 'Eu precisava explicar meu serviço sem aquele site cheio de informação solta. O resultado ficou claro e com um caminho fácil para entrar em contato', 5],
-      ['Rafael M.', 'm1', 'Tráfego pago', 'Gostei de acompanhar o raciocínio das campanhas. As revisões e os próximos passos ficaram muito mais fáceis de entender', 5],
-      ['Camila R.', 'f2', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. Curti demais o cuidado com as cores e o jeito de organizar cada assunto', 5],
-      ['Lucas F.', 'm2', 'Edição de vídeo', 'O corte deu outro ritmo ao material. Legendas bem colocadas e transições na medida', 5],
-      ['Beatriz S.', 'f3', 'Gestão de Instagram', 'Ter um calendário e uma linha de comunicação ajudou a organizar a rotina. As sugestões fizeram sentido para a marca', 4],
-      ['Diego P.', 'm3', 'Site institucional', 'O site ficou rápido no celular e os clientes passaram a chegar já sabendo o que eu faço', 5],
-      ['Juliana T.', 'f4', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Agora tudo conversa', 5],
-      ['André L.', 'm4', 'Tráfego pago', 'Os relatórios são simples de ler e eu sei exatamente para onde está indo cada real', 5],
-      ['Patrícia N.', 'f5', 'Vídeos para anúncios', 'A gravação foi leve e o resultado ficou natural. Os vídeos já estão rodando nos anúncios', 5],
-      ['Felipe C.', 'm5', 'Estratégia', 'O diagnóstico mostrou o que fazer primeiro. Saí da reunião com um plano claro', 5],
-      ['Larissa V.', 'f6', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram muito mais organizados', 5],
-      ['Gustavo R.', 'm6', 'Conteúdo', 'Finalmente tenho constância nas redes sem precisar pensar em tudo sozinho', 4]
+      ['Marina A.', 'f1', 'Landing page', 'Eu queria um site que explicasse meu serviço sem enrolação. Ficou bem direto e o pessoal já chega no WhatsApp sabendo o que quer', 5],
+      ['Rafael M.', 'm1', 'Tráfego pago', 'O que mais gostei foi entender o que estava sendo feito nas campanhas. Sempre me explicaram o porquê de cada mudança', 4.5],
+      ['Camila R.', 'f2', 'Posts para Instagram', 'Meu feed finalmente ficou com a minha cara. As cores, os textos, agora tudo conversa', 5],
+      ['Lucas F.', 'm2', 'Edição de vídeo', 'Os vídeos ganharam outro ritmo. Pedi uns ajustes nas legendas e resolveram rapidinho', 4],
+      ['Beatriz S.', 'f3', 'Gestão de Instagram', 'Ter um calendário de posts tirou um peso das costas. Não fico mais perdida pensando no que postar', 4.5],
+      ['Diego P.', 'm3', 'Site institucional', 'O site abre rápido no celular e os clientes chegam já sabendo o que eu faço. Fez diferença', 5],
+      ['Juliana T.', 'f4', 'Identidade visual', 'A marca nova deixou tudo mais profissional, do cartão ao Instagram. Até cliente antigo comentou', 5],
+      ['André L.', 'm4', 'Tráfego pago', 'Relatório simples, sem aquele monte de número solto. Sei pra onde está indo cada real', 4],
+      ['Patrícia N.', 'f5', 'Vídeos para anúncios', 'Eu morro de vergonha de câmera, mas a gravação foi tranquila e o resultado ficou bem natural', 5],
+      ['Felipe C.', 'm5', 'Estratégia', 'Já na primeira conversa saí com uma lista do que fazer primeiro. Clareou bastante a cabeça', 4.5],
+      ['Larissa V.', 'f6', 'Landing page', 'Página bonita e objetiva. Os agendamentos ficaram bem mais organizados', 5],
+      ['Gustavo R.', 'm6', 'Conteúdo', 'Hoje consigo manter as redes ativas sem ter que pensar em tudo sozinho', 4]
     ];
     var P = [['#FF7417', '#B5179E'], ['#7B3FE4', '#31D6C2'], ['#FF987F', '#7B3FE4'], ['#31D6C2', '#4B1DB5'], ['#FFB347', '#FF7417'], ['#B99AF5', '#4B1DB5']];
     function card(t, i) {
       t = [t[0], t[2], t[3], t[4], t[1]];
-      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><img class="tm-av" src="/assets/faces/' + t[4] + '.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>' + t[0] + '</b><small>' + t[1] + '</small></span><span class="tm-st" aria-label="' + t[3] + ' de 5 estrelas">' + '★★★★★'.slice(0, t[3]) + '</span></div></article>';
+      return '<article class="tm"><p>“' + t[2] + '”</p><div class="tm-who"><img class="tm-av" src="/assets/faces/' + t[4] + '.webp" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b>' + t[0] + '</b><small>' + t[1] + '</small></span><span class="tm-st" aria-label="' + String(t[3]).replace('.', ',') + ' de 5 estrelas">' + [0, 1, 2, 3, 4].map(function (n) { var f = Math.max(0, Math.min(1, t[3] - n)); return '<i style="--f:' + (f * 100) + '%">★</i>'; }).join('') + '</span></div></article>';
     }
     function row(list, cls) { var h = list.map(card).join(''); return '<div class="tm-row ' + cls + '">' + h + h.replace(/<article class="tm">/g, '<article class="tm" aria-hidden="true">') + '</div>'; }
     box.innerHTML = row(T.slice(0, 6), 'l') + row(T.slice(6), 'r');
+    // faixas em movimento contínuo (não param no hover); clicar e arrastar adianta cada faixa
+    var rows = [].slice.call(box.querySelectorAll('.tm-row')).map(function (el, i) { return { el: el, dir: i ? 1 : -1, x: 0, v: 0, drag: null, half: 1, init: !i }; });
+    function measure() { rows.forEach(function (r) { r.half = r.el.scrollWidth / 2 || 1; if (!r.init) { r.init = true; r.x = -r.half * 0.5; } }); }
+    measure(); addEventListener('resize', measure);
+    var vis = true, last = 0, raf = 0;
+    function step(now) {
+      raf = 0; var dt = Math.min(0.05, last ? (now - last) / 1000 : 0); last = now;
+      rows.forEach(function (r) {
+        if (!r.drag || !r.drag.on) { r.x += (RM ? 0 : r.dir * r.half / 60) * dt + r.v * dt; r.v *= Math.pow(0.04, dt); }
+        r.x = ((r.x % r.half) - r.half) % r.half; r.el.style.transform = 'translate3d(' + r.x.toFixed(2) + 'px,0,0)';
+      });
+      if (vis) raf = requestAnimationFrame(step); else last = 0;
+    }
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(step); }, { rootMargin: '100px' }).observe(box);
+    raf = requestAnimationFrame(step);
+    rows.forEach(function (r) {
+      r.el.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; r.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), on: false }; });
+      r.el.addEventListener('pointermove', function (e) {
+        var d = r.drag; if (!d || d.id !== e.pointerId) return;
+        var dx = e.clientX - d.x, dy = e.clientY - d.y;
+        if (!d.on) { if (Math.abs(dx) < 6) return; if (Math.abs(dy) > Math.abs(dx)) { r.drag = null; return; } d.on = true; r.v = 0; r.el.classList.add('tm-drag'); try { r.el.setPointerCapture(e.pointerId); } catch (_) {} }
+        var nt = performance.now(), dtt = Math.max(8, nt - d.t) / 1000; r.x += dx; r.v = r.v * 0.5 + (dx / dtt) * 0.5; d.x = e.clientX; d.y = e.clientY; d.t = nt;
+      });
+      function up(e) { var d = r.drag; if (!d || d.id !== e.pointerId) return; r.drag = null; r.el.classList.remove('tm-drag'); if (performance.now() - d.t > 90) r.v = 0; r.v = Math.max(-2500, Math.min(2500, r.v)); }
+      r.el.addEventListener('pointerup', up); r.el.addEventListener('pointercancel', up);
+      r.el.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    });
   })();
 
   /* botões que levam ao onboarding */
