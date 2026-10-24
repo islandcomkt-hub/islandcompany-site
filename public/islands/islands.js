@@ -154,7 +154,7 @@
       canvas = el('canvas', 'isl-cv', stage); canvas.setAttribute('aria-hidden', 'true'); stage.insertBefore(canvas, stage.firstChild); canvas.style.height = HO + 'px';
       canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); fail('contexto perdido'); });
       try { sc = mod.createScene(canvas, D); } catch (e) { fail(e && e.message || e); return; }
-      sc.layout(mobile); sizeCanvas();
+      sc.layout(mobile); sizeCanvas(); startClock();
       boatRy = sc.dockBoat(boatAt, boatSide);
       applyEnter(); setHO(HO); applyCam(introCam(camOverview(), enterK), HO); sc.setFocus(-1);
       var extra = D.islands.filter(function (d) { return d.person; }).map(function (d) { return new Promise(function (r) { var p = new Image(); p.onload = p.onerror = r; p.src = d.person.photo; }); });
@@ -164,6 +164,27 @@
       });
     }, function (e) { fail(e && e.message || e); });
     return loading;
+  }
+  /* ---------- relógio: as ilhas seguem a hora do visitante ---------- */
+  var clk = null, forced = (function () { var m = /[?&]hora=(\d{1,2})(?::(\d{2}))?/.exec(location.search); return m ? (+m[1] + (+m[2] || 0) / 60) : null; })();
+  function hourNow() { var d = new Date(); return forced != null ? forced : d.getHours() + d.getMinutes() / 60; }
+  function tickClock() {
+    var h = hourNow(); if (sc && sc.setHour) sc.setHour(h);
+    if (!clk) return;
+    var hh = Math.floor(h), mm = Math.round((h - hh) * 60); if (mm === 60) { hh = (hh + 1) % 24; mm = 0; }
+    var day = h >= 6 && h < 18, dusk = (h >= 5 && h < 7) || (h >= 17 && h < 19.5);
+    clk.dataset.tod = dusk ? 'dusk' : (day ? 'day' : 'night');
+    clk.querySelector('b').textContent = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+    clk.querySelector('small').textContent = dusk ? (h < 12 ? 'amanhecer' : 'entardecer') : (day ? 'de dia' : 'de noite');
+    clk.setAttribute('aria-label', 'Hora nas ilhas: ' + clk.querySelector('b').textContent + ', ' + clk.querySelector('small').textContent);
+  }
+  function startClock() {
+    if (!clk) {
+      clk = document.createElement('div'); clk.className = 'isl-clock'; clk.setAttribute('role', 'status');
+      clk.innerHTML = '<span class="ic" aria-hidden="true"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg></span><span class="tx"><b>--:--</b><small></small></span>';
+      stage.appendChild(clk);
+    }
+    tickClock(); setInterval(function () { tickClock(); if (!raf) renderNow(); }, 30000);
   }
   function sizeCanvas() { if (!sc) return; sc.resize(W, HO, Math.min(Math.max(window.devicePixelRatio || 1, mobile ? 1.5 : 1.5), mobile ? 2 : 2.5)); }
 
