@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
+<title>Plano Black Friday Island</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Yeseva+One&family=Caveat:wght@700&display=swap">
+<style>
+/* Layout: uma coluna estreita, ritmo de carrossel — blocos com tira de papel rasgado e cards de copiar */
+:root{
+  --bg:#FAFAF6; --fg:#141414; --muted:#5d5a63; --card:#ffffff; --line:#e6e2d8;
+  --purple:#6703D5; --orange:#FE7002; --teal:#03C99A; --tealbg:#C9F7EA; --yellow:#FFE62E; --ink:#141414;
+  --display:'Yeseva One', Georgia, serif; --sans:'Poppins', system-ui, sans-serif; --hand:'Caveat', 'Comic Sans MS', cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#120A1F; --fg:#F4F1FA; --muted:#b9b1c9; --card:#1D1430; --line:#33284a; --tealbg:#0d3b33; --ink:#141414; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#120A1F; --fg:#F4F1FA; --muted:#b9b1c9; --card:#1D1430; --line:#33284a; --tealbg:#0d3b33; --ink:#141414; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;padding-block:28px 64px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{background:var(--purple);border-radius:40px;padding:8px 16px;display:inline-flex}
+.logo img{height:26px;display:block}
+.ig{font-weight:600;font-size:14px;color:var(--muted)}
+.hero{position:relative;margin-top:28px}
+.tag{display:inline-block;background:var(--teal);color:var(--ink);font-weight:800;font-size:13px;letter-spacing:1.5px;padding:6px 14px;transform:rotate(-2deg)}
+h1{font-weight:900;text-transform:uppercase;letter-spacing:-1.5px;line-height:.95;font-size:clamp(40px,9vw,72px);margin:18px 0 0;text-wrap:balance}
+.strip{display:inline-block;background:var(--orange);color:var(--purple);font-family:var(--display);font-size:clamp(44px,10vw,84px);line-height:1;padding:4px 18px 12px;transform:rotate(-2deg);margin-top:6px;
+  clip-path:polygon(0 4%,8% 0,22% 3%,40% 0,61% 4%,80% 1%,100% 3%,99% 50%,100% 97%,84% 100%,62% 96%,41% 100%,20% 96%,2% 100%,1% 50%)}
+.lead{font-size:19px;max-width:560px;margin:22px 0 0}
+.crab{position:absolute;right:-6px;top:120px;width:150px;transform:rotate(6deg);filter:drop-shadow(6px 8px 0 rgba(20,20,20,.85))}
+@media (max-width:560px){.crab{position:static;display:block;margin:16px 0 0 auto;width:120px}}
+.fact{margin-top:28px;background:var(--card);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:18px;padding:18px 20px}
+.fact b{color:var(--purple)}
+:root[data-theme="dark"] .fact b{color:#B98AFF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .fact b{color:#B98AFF}}
+.fact small{display:block;color:var(--muted);margin-top:6px;font-size:13px}
+h2{font-weight:900;text-transform:uppercase;letter-spacing:-1px;font-size:clamp(28px,6vw,40px);line-height:1;margin:56px 0 8px;text-wrap:balance}
+h2 .hl{background:var(--yellow);color:var(--ink);padding:0 8px}
+.sub{color:var(--muted);margin:0 0 20px}
+.qs{display:grid;gap:12px;counter-reset:q}
+.q{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px}
+.q .n{width:52px;height:52px;border-radius:14px;background:var(--teal);color:var(--ink);display:grid;place-items:center;font-weight:900;font-size:24px}
+.q h3{margin:2px 0 4px;font-size:19px;font-weight:800}
+.q p{margin:0;color:var(--muted)}
+.q em{font-style:normal;font-family:var(--hand);font-size:22px;color:var(--orange)}
+.copy{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:18px;margin-top:14px;box-shadow:6px 6px 0 var(--ink)}
+.copy .top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px 0 18px}
+.copy .label{font-weight:800;font-size:15px}
+.copy .label span{display:inline-block;background:var(--tealbg);color:var(--fg);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:6px;letter-spacing:.5px}
+.copy pre{margin:0;padding:10px 18px 18px;white-space:pre-wrap;font-family:var(--sans);font-size:15.5px;line-height:1.55;color:var(--fg)}
+.copy mark{background:var(--yellow);color:var(--ink);border-radius:4px;padding:0 3px}
+button.cp{font:700 14px var(--sans);background:var(--purple);color:#fff;border:0;border-radius:30px;padding:9px 16px;cursor:pointer;flex:none}
+button.cp:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button.cp.ok{background:var(--teal);color:var(--ink)}
+.grid{display:grid;gap:16px}
+.end{margin-top:56px;background:var(--ink);color:#fff;border-radius:24px;padding:26px 24px;position:relative;overflow:hidden}
+.end h2{margin:0;color:#fff}
+.end p{color:#ddd;max-width:520px}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;text-decoration:none;border-radius:40px;padding:14px 22px;border:3px solid #fff}
+.btn.a{background:var(--orange);color:var(--ink);border-color:var(--orange)}
+.btn.b{color:#fff}
+.btn:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.octo{position:absolute;right:-10px;bottom:-14px;width:150px;opacity:.95}
+@media (max-width:560px){.octo{display:none}}
+.note{font-family:var(--hand);font-size:24px;color:var(--purple);transform:rotate(-2deg);display:inline-block;margin-top:10px}
+footer{margin-top:28px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){button.cp{transition:background .2s}}
+</style>
+
+</head><body>
+<div class="wrap">
+<header><span class="logo"><img src="/briefing/logo.png" alt="Island Co."></span><span class="ig">@islandco.mkt</span></header>
+
+<section class="hero">
+<span class="tag">PLANO BLACK FRIDAY</span>
+<h1>Sua Black Friday<br>já começou</h1>
+<div class="strip">lista antes de oferta</div>
+<p class="lead">O calendário de 4 semanas até 27/11 e as mensagens prontas pra sua lista VIP. Copie, troque o que está em amarelo e siga a ordem.</p>
+<img class="crab" src="/briefing/baiacu.png" alt="">
+</section>
+
+<div class="fact">Mais de <b>60%</b> dos consumidores começam a pesquisar a Black Friday com um mês ou mais de antecedência, e <b>67%</b> comprariam antes da data com uma boa oferta.
+<small>Fonte: pesquisa Helloo (600 consumidores, ago/2026), publicada pela Mercado&amp;Consumo em 07/10/2026</small></div>
+
+<h2>O plano de <span class="hl">4 semanas</span></h2>
+<p class="sub">Black Friday 2026: sexta, 27 de novembro.</p>
+<div class="qs"><div class="q"><div class="n">1</div><div><h3>Semana 1: abra a lista VIP</h3><p>Grupo ou lista de transmissão no WhatsApp, ou Close Friends. Diga o que quem entrar vai ganhar</p></div></div><div class="q"><div class="n">2</div><div><h3>Semana 2: aqueça</h3><p>Posts sobre os produtos que vão entrar e um anúncio de mensagem pra encher a lista</p></div></div><div class="q"><div class="n">3</div><div><h3>Semana 3: pré-venda pra lista</h3><p>Abra a oferta só pra lista, antes de todo mundo. É aqui que entram os 67%</p></div></div><div class="q"><div class="n">4</div><div><h3>Semana 4: oferta aberta</h3><p>Oferta pública com prazo de verdade e estoque real. Sem prorrogar</p></div></div></div>
+
+<h2>O modelo <span class="hl">em branco</span></h2>
+<p class="sub">Copie, preencha o que está em amarelo e cole na IA.</p>
+<div id="modelo"></div>
+
+<h2>Mensagens <span class="hl">prontas</span></h2>
+<p class="sub">Do convite pra lista até a última chamada.</p>
+<div class="grid" id="lista"></div>
+
+<div class="end">
+<h2>Quer que a gente faça com você?</h2>
+<p>No diagnóstico Island você responde 6 perguntas sobre o seu negócio e recebe a direção certa pra conteúdo, anúncio e site.</p>
+<div class="btns">
+<a class="btn a" href="https://onboarding.islandcompany.space/?utm_source=instagram&utm_medium=dm&utm_campaign=blackfriday" target="_blank" rel="noopener">Fazer o diagnóstico</a>
+<a class="btn b" href="https://wa.me/5531988690118?text=Quero%20ajuda%20com%20minha%20Black%20Friday" target="_blank" rel="noopener">Falar no WhatsApp</a>
+</div>
+<span class="note" style="color:var(--teal)">novos horizontes exigem direção</span>
+<img class="octo" src="/briefing/polvo.png" alt="">
+</div>
+<footer>Island Company · islandcompany.space · WhatsApp (31) 98869-0118</footer>
+</div>
+
+<script>
+const H = s => s.replace(/\[([^\]]+)\]/g, '<mark>[$1]</mark>');
+const modelo = {"label": "Convite pra lista VIP", "tag": "semana 1", "text": "Oi, [nome]! Vou abrir uma lista VIP da Black Friday da [loja]. Quem entrar recebe [vantagem real: acesso antecipado / cupom extra / brinde] antes de todo mundo. Quer entrar? É só responder SIM."};
+const lista = [{"label": "Post de anúncio da lista", "tag": "semana 1", "text": "Crie um post anunciando a lista VIP da Black Friday da [loja] em [cidade]. Quem entrar ganha [vantagem]. CTA: chamar no WhatsApp com a palavra VIP."}, {"label": "Boas-vindas na lista", "tag": "semana 1", "text": "Bem-vindo(a) à lista VIP, [nome]! 🖤 Dia [data] você recebe aqui a pré-venda, antes do site e da loja. Enquanto isso, me conta: o que você está de olho?"}, {"label": "Aquecimento: teaser", "tag": "semana 2", "text": "Spoiler pra lista VIP 👀 [produto] vai entrar na Black Friday com [condição]. Só vocês sabem por enquanto."}, {"label": "Aquecimento: enquete", "tag": "semana 2", "text": "Ajuda a gente a escolher, [nome]: qual destes você quer ver com desconto? 1) [produto A] 2) [produto B] 3) [produto C]"}, {"label": "Abertura da pré-venda", "tag": "semana 3", "text": "Abriu, [nome]! A pré-venda da lista VIP começou: [oferta]. Vale até [data] ou enquanto durar o estoque de [quantidade]. Quer reservar?"}, {"label": "Últimas unidades", "tag": "semana 3", "text": "[nome], restam [quantidade] unidades de [produto] na pré-venda. Quer que eu separe a sua?"}, {"label": "Oferta aberta", "tag": "semana 4", "text": "Começou a Black Friday da [loja] 🖤 [oferta principal]. Válido até [data e hora]. Pra comprar: [link / endereço / responda aqui]."}, {"label": "Última chamada", "tag": "semana 4", "text": "Última chamada, [nome]: a Black Friday termina hoje às [hora]. Depois disso, [o que muda de verdade]."}, {"label": "Pós-Black Friday", "tag": "depois", "text": "Obrigado por comprar na Black Friday, [nome]! Como foi a experiência? Se puder, deixa uma avaliação aqui: [link]"}, {"label": "Pauta de posts do mês", "tag": "IA", "text": "Crie 8 posts para a Black Friday da [loja] em [cidade], de [data] a 27/11: 2 pra divulgar a lista VIP, 3 de aquecimento, 2 de oferta e 1 de última chamada. Para cada um: formato, gancho da capa e CTA. Não invente descontos: use só [ofertas reais]."}];
+function card(item, id){
+  const d = document.createElement('div'); d.className='copy';
+  d.innerHTML = `<div class="top"><div class="label">${item.label}<span>${item.tag}</span></div><button class="cp" id="${id}" type="button">Copiar</button></div><pre>${H(item.text)}</pre>`;
+  const b = d.querySelector('button');
+  b.addEventListener('click', () => {
+    const done = () => { b.textContent='Copiado'; b.classList.add('ok'); setTimeout(()=>{b.textContent='Copiar'; b.classList.remove('ok')},1800); };
+    const sel = () => { const r=document.createRange(); r.selectNodeContents(d.querySelector('pre')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent='Selecionado, copie'; };
+    try { navigator.clipboard.writeText(item.text).then(done, sel); } catch(e){ sel(); }
+  });
+  return d;
+}
+document.getElementById('modelo').appendChild(card(modelo,'cp-modelo'));
+const L = document.getElementById('lista'); lista.forEach((it,i)=>L.appendChild(card(it,'cp-'+i)));
+</script>
+
+</body></html>
